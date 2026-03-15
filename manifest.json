@@ -1,0 +1,23 @@
+{
+  "name": "Benaion Delivery",
+  "short_name": "Benaion",
+  "description": "Sistema de Gestão de Entregas Benaion",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#E30613",
+  "theme_color": "#E30613",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "https://via.placeholder.com/192x192.png?text=Benaion",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://via.placeholder.com/512x512.png?text=Benaion",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
+
