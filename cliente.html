@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#E30613">
+  <title>Cliente - BENAION DELIVERY</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <div class="header-top">
+        <div class="logo">
+          <div class="logo-icon"><i class="fas fa-user"></i></div>
+          <div class="logo-text">
+            <h1 id="clienteNome">Cliente</h1>
+            <p>Meus Pedidos</p>
+          </div>
+        </div>
+        <div class="header-actions">
+          <button class="header-btn" onclick="Auth.logout()"><i class="fas fa-sign-out-alt"></i></button>
+        </div>
+      </div>
+    </header>
+
+    <main class="page">
+      <!-- Banner de Boas-vindas -->
+      <div class="card" style="background: linear-gradient(135deg, var(--primary-red), #c00510); color: white; text-align: center;">
+        <h2 style="margin-bottom: 8px;">👋 Bem-vindo!</h2>
+        <p style="opacity: 0.9; font-size: 14px;">Conectando você ao que precisa, rápido e seguro</p>
+      </div>
+
+      <!-- Botão Novo Pedido -->
+      <button class="btn btn-primary mb-2" onclick="Utils.showModal('novoPedidoModal')" style="font-size: 18px; padding: 18px;">
+        <i class="fas fa-plus-circle"></i> Fazer Novo Pedido
+      </button>
+
+      <!-- Parceiros Disponíveis -->
+      <div class="card">
+        <h3 style="margin-bottom: 16px; color: var(--primary-red);">🏪 Parceiros Disponíveis</h3>
+        <div id="listaParceiros" style="display: grid; gap: 12px;"></div>
+      </div>
+
+      <!-- Meus Pedidos -->
+      <h3 style="margin: 24px 0 16px; color: var(--dark);">📦 Meus Pedidos</h3>
+      <div id="listaPedidos"></div>
+
+      <!-- Informações -->
+      <div class="card" style="background: var(--light-gray); margin-top: 24px;">
+        <h4 style="color: var(--primary-red); margin-bottom: 12px;">⚠️ Regras de Transporte</h4>
+        <p style="font-size: 13px; color: var(--gray); line-height: 1.6;">
+          A BENAION DELIVERY NÃO TRANSPORTA:<br>
+          ❌ Bebidas alcoólicas<br>
+          ❌ Cigarros<br>
+          ❌ Drogas<br>
+          ❌ Passageiros
+        </p>
+      </div>
+
+      <div style="text-align: center; padding: 20px; color: var(--gray); font-size: 12px;">
+        <p>Aceitamos Pix, cartão e dinheiro 💳💰</p>
+        <p style="margin-top: 8px;">O bom atendimento começa com você,<br>o restante deixa com a gente 😊</p>
+      </div>
+    </main>
+
+    <nav class="bottom-nav">
+      <button class="nav-item active"><i class="fas fa-home"></i><span>Início</span></button>
+      <button class="nav-item" onclick="Utils.showModal('novoPedidoModal')"><i class="fas fa-plus-circle"></i><span>Novo</span></button>
+      <button class="nav-item" onclick="mostrarEnderecos()"><i class="fas fa-map-marker-alt"></i><span>Endereços</span></button>
+      <button class="nav-item" onclick="mostrarPerfil()"><i class="fas fa-user"></i><span>Perfil</span></button>
+    </nav>
+  </div>
+
+  <!-- Modal Novo Pedido -->
+  <div class="modal" id="novoPedidoModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">🛒 Novo Pedido</h3>
+        <button class="modal-close" onclick="Utils.hideModal('novoPedidoModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="novoPedidoForm" onsubmit="criarPedido(event)">
+          <div class="form-group">
+            <label class="form-label">Escolha o Parceiro (Opcional)</label>
+            <select class="form-control" id="pedidoParceiro">
+              <option value="">Não especificado</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Endereço de Retirada *</label>
+            <input type="text" class="form-control" id="pedidoRetirada" required placeholder="Onde buscar o produto">
+          </div>
+          <div class="form-group">
+            <label class="form-label">O que deseja? *</label>
+            <input type="text" class="form-control" id="pedidoProduto" required placeholder="Ex: 1 Pizza grande">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Valor (R$) *</label>
+            <input type="number" class="form-control" id="pedidoValor" required step="0.01" min="0">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Meu Endereço de Entrega *</label>
+            <select class="form-control" id="pedidoEndereco" required onchange="toggleNovoEndereco()">
+              <option value="">Selecione...</option>
+              <option value="novo">➕ Adicionar novo endereço</option>
+            </select>
+          </div>
+          <div id="novoEnderecoGroup" style="display: none;">
+            <div class="form-group">
+              <input type="text" class="form-control" id="pedidoNovoEndereco" placeholder="Digite seu endereço completo">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Bairro *</label>
+            <select class="form-control" id="pedidoBairro" required>
+              <option value="Laranjal do Jari">Laranjal do Jari</option>
+              <option value="Monte Dourado">Monte Dourado</option>
+              <option value="Vitória do Jari">Vitória do Jari</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Forma de Pagamento *</label>
+            <select class="form-control" id="pedidoPagamento" required onchange="toggleTroco()">
+              <option value="pix">PIX</option>
+              <option value="cartao">Cartão</option>
+              <option value="dinheiro">Dinheiro</option>
+            </select>
+          </div>
+          <div class="form-group" id="trocoGroup" style="display: none;">
+            <label class="form-label">Precisa de troco para quanto?</label>
+            <input type="number" class="form-control" id="pedidoTroco" step="0.01" min="0">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Observações</label>
+            <textarea class="form-control" id="pedidoObs" placeholder="Informações adicionais..."></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary"><i class="fas fa-check"></i> Solicitar Entrega</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Detalhes do Pedido -->
+  <div class="modal" id="detalhesPedidoModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">📦 Detalhes do Pedido</h3>
+        <button class="modal-close" onclick="Utils.hideModal('detalhesPedidoModal')">&times;</button>
+      </div>
+      <div class="modal-body" id="detalhesPedidoContent"></div>
+    </div>
+  </div>
+
+  <script src="/js/utils.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js"></script>
+  <script>
+    Auth.requireAuth(['cliente']);
+    const currentUser = Auth.getCurrentUser();
+    let pedidos = [];
+    let enderecos = [];
+    let parceiros = [];
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      document.getElementById('clienteNome').textContent = currentUser.name.split(' ')[0];
+      await carregarDados();
+      setInterval(() => carregarDados(), 30000);
+    });
+
+    async function carregarDados() {
+      try {
+        const [pedidosResult, enderecosData, parceirosResult] = await Promise.all([
+          API.getPedidosByUser(currentUser.id, 'cliente'),
+          API.getEnderecos(currentUser.id),
+          API.getParceiros(1, 100)
+        ]);
+        
+        pedidos = pedidosResult;
+        enderecos = enderecosData;
+        parceiros = parceirosResult.data.filter(p => p.status === 'ativo');
+        
+        renderizarPedidos();
+        renderizarParceiros();
+        renderizarEnderecosSelect();
+      } catch (error) {
+        console.error('Erro:', error);
+      }
+    }
+
+    function renderizarParceiros() {
+      const container = document.getElementById('listaParceiros');
+      if (parceiros.length === 0) {
+        container.innerHTML = '<p style="color: var(--gray); font-size: 13px;">Nenhum parceiro disponível</p>';
+        return;
+      }
+      
+      // Ordenar: premium primeiro
+      parceiros.sort((a, b) => (b.premium ? 1 : 0) - (a.premium ? 1 : 0));
+      
+      container.innerHTML = parceiros.slice(0, 5).map(p => `
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px; background: var(--light-gray); border-radius: 8px;">
+          <div>
+            <div style="font-weight: 600; color: var(--dark);">
+              ${p.nomeComercio} ${p.premium ? '⭐' : ''}
+            </div>
+            <div style="font-size: 12px; color: var(--gray);">${p.tipoComercio} • ${p.telefone}</div>
+          </div>
+          <button class="btn btn-small btn-outline" onclick="pedirDe('${p.id}', '${p.nomeComercio}', '${p.endereco}')">
+            <i class="fas fa-shopping-bag"></i>
+          </button>
+        </div>
+      `).join('');
+    }
+
+    function renderizarEnderecosSelect() {
+      const select = document.getElementById('pedidoEndereco');
+      const opcoes = enderecos.map(e => 
+        `<option value="${e.endereco}">${e.apelido || e.endereco}</option>`
+      ).join('');
+      select.innerHTML = `<option value="">Selecione...</option>${opcoes}<option value="novo">➕ Adicionar novo endereço</option>`;
+      
+      // Select de parceiros
+      const selectParceiros = document.getElementById('pedidoParceiro');
+      selectParceiros.innerHTML = '<option value="">Não especificado</option>' +
+        parceiros.map(p => `<option value="${p.id}">${p.nomeComercio}</option>`).join('');
+    }
+
+    function renderizarPedidos() {
+      const container = document.getElementById('listaPedidos');
+      if (pedidos.length === 0) {
+        Utils.showEmptyState(container, '📦', 'Nenhum pedido ainda', 'Faça seu primeiro pedido agora!');
+        return;
+      }
+      
+      pedidos.sort((a, b) => b.created_at - a.created_at);
+      container.innerHTML = pedidos.map(p => `
+        <div class="pedido-card" onclick="verDetalhes('${p.id}')">
+          <div class="pedido-header">
+            <div class="pedido-numero">#${p.id.substring(0, 8)}</div>
+            <span class="status-badge status-${p.status}">${Utils.getStatusIcon(p.status)} ${Utils.getStatusText(p.status)}</span>
+          </div>
+          <div class="pedido-info">
+            <div class="info-row"><span class="info-label">📦 Produto:</span><span>${p.produto}</span></div>
+            <div class="info-row"><span class="info-label">📍 Entrega:</span><span>${p.enderecoEntrega}</span></div>
+            <div class="info-row"><span class="info-label">💰 Valor:</span><span>${Utils.formatCurrency(p.valor)}</span></div>
+            ${p.entregadorNome ? `<div class="info-row"><span class="info-label">🛵 Entregador:</span><span>${p.entregadorNome}</span></div>` : ''}
+          </div>
+          <div style="margin-top: 8px; font-size: 12px; color: var(--gray);">
+            <i class="fas fa-clock"></i> ${Utils.timeAgo(p.created_at)}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    async function criarPedido(e) {
+      e.preventDefault();
+      const btn = e.target.querySelector('button[type="submit"]');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Solicitando...';
+      
+      try {
+        const parceiroId = document.getElementById('pedidoParceiro').value;
+        let parceiroNome = '';
+        let enderecoRetirada = document.getElementById('pedidoRetirada').value;
+        
+        if (parceiroId) {
+          const parceiro = parceiros.find(p => p.id === parceiroId);
+          parceiroNome = parceiro.nomeComercio;
+          enderecoRetirada = parceiro.endereco;
+        }
+        
+        let enderecoEntrega = document.getElementById('pedidoEndereco').value;
+        if (enderecoEntrega === 'novo') {
+          enderecoEntrega = document.getElementById('pedidoNovoEndereco').value;
+          if (!enderecoEntrega) {
+            Utils.showToast('Digite o novo endereço', 'warning');
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-check"></i> Solicitar Entrega';
+            return;
+          }
+        }
+        
+        await API.createPedido({
+          clienteId: currentUser.id,
+          clienteNome: currentUser.name,
+          enderecoRetirada,
+          produto: document.getElementById('pedidoProduto').value,
+          valor: parseFloat(document.getElementById('pedidoValor').value),
+          enderecoEntrega,
+          bairro: document.getElementById('pedidoBairro').value,
+          formaPagamento: document.getElementById('pedidoPagamento').value,
+          troco: parseFloat(document.getElementById('pedidoTroco').value) || 0,
+          observacoes: document.getElementById('pedidoObs').value,
+          parceiroId: parceiroId || null,
+          parceiroNome,
+          status: 'aguardando_entregador'
+        });
+        
+        Utils.showToast('Pedido criado! Aguarde um entregador aceitar 🎉', 'success');
+        Utils.hideModal('novoPedidoModal');
+        e.target.reset();
+        await carregarDados();
+      } catch (error) {
+        console.error(error);
+        Utils.showToast('Erro ao criar pedido', 'error');
+      }
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fas fa-check"></i> Solicitar Entrega';
+    }
+
+    async function verDetalhes(pedidoId) {
+      try {
+        const p = await API.getPedido(pedidoId);
+        document.getElementById('detalhesPedidoContent').innerHTML = `
+          <div style="text-align: center; margin-bottom: 20px;">
+            <div class="pedido-numero" style="font-size: 24px;">#${p.id.substring(0, 8)}</div>
+            <span class="status-badge status-${p.status}" style="font-size: 14px; margin-top: 8px; display: inline-block;">
+              ${Utils.getStatusIcon(p.status)} ${Utils.getStatusText(p.status)}
+            </span>
+          </div>
+          <div style="background: var(--light-gray); padding: 20px; border-radius: 12px;">
+            <div style="margin-bottom: 16px;"><strong>📦 Produto:</strong><br>${p.produto}</div>
+            <div style="margin-bottom: 16px;"><strong>💰 Valor:</strong><br><span style="font-size: 24px; color: var(--primary-red);">${Utils.formatCurrency(p.valor)}</span></div>
+            <div style="margin-bottom: 16px;"><strong>🏪 Retirada:</strong><br>${p.enderecoRetirada}</div>
+            <div style="margin-bottom: 16px;"><strong>📍 Entrega:</strong><br>${p.enderecoEntrega}, ${p.bairro}</div>
+            <div style="margin-bottom: 16px;"><strong>💳 Pagamento:</strong><br>${p.formaPagamento.toUpperCase()}${p.troco > 0 ? ` (Troco: ${Utils.formatCurrency(p.troco)})` : ''}</div>
+            ${p.entregadorNome ? `<div style="margin-bottom: 16px;"><strong>🛵 Entregador:</strong><br>${p.entregadorNome}</div>` : ''}
+            ${p.observacoes ? `<div><strong>📝 Observações:</strong><br>${p.observacoes}</div>` : ''}
+          </div>
+          <div style="margin-top: 16px; font-size: 12px; color: var(--gray); text-align: center;">
+            Pedido realizado em ${Utils.formatDateTime(p.created_at)}
+          </div>
+          ${['recebido', 'aguardando_entregador'].includes(p.status) ? `
+            <button class="btn btn-outline mt-2" style="background: var(--gray); color: white;" onclick="cancelarPedido('${p.id}')">
+              <i class="fas fa-times"></i> Cancelar Pedido
+            </button>
+          ` : ''}
+        `;
+        Utils.showModal('detalhesPedidoModal');
+      } catch (error) {
+        console.error(error);
+        Utils.showToast('Erro ao carregar detalhes', 'error');
+      }
+    }
+
+    async function cancelarPedido(pedidoId) {
+      if (!confirm('Deseja realmente cancelar este pedido?')) return;
+      try {
+        await API.updatePedido(pedidoId, { status: 'cancelado' });
+        Utils.showToast('Pedido cancelado', 'info');
+        Utils.hideModal('detalhesPedidoModal');
+        await carregarDados();
+      } catch (error) {
+        Utils.showToast('Erro ao cancelar', 'error');
+      }
+    }
+
+    function pedirDe(parceiroId, nome, endereco) {
+      Utils.showModal('novoPedidoModal');
+      document.getElementById('pedidoParceiro').value = parceiroId;
+      document.getElementById('pedidoRetirada').value = endereco;
+    }
+
+    function toggleNovoEndereco() {
+      const valor = document.getElementById('pedidoEndereco').value;
+      document.getElementById('novoEnderecoGroup').style.display = valor === 'novo' ? 'block' : 'none';
+    }
+
+    function toggleTroco() {
+      const pag = document.getElementById('pedidoPagamento').value;
+      document.getElementById('trocoGroup').style.display = pag === 'dinheiro' ? 'block' : 'none';
+    }
+
+    function mostrarEnderecos() {
+      alert('Endereços salvos:\n\n' + (enderecos.length > 0 ? enderecos.map(e => `${e.apelido || 'Endereço'}: ${e.endereco}`).join('\n') : 'Nenhum endereço salvo'));
+    }
+
+    function mostrarPerfil() {
+      alert(`Nome: ${currentUser.name}\nEmail: ${currentUser.email}\nTelefone: ${currentUser.phone || 'Não informado'}`);
+    }
+
+    document.querySelectorAll('.modal').forEach(m => {
+      m.addEventListener('click', e => {
+        if (e.target.classList.contains('modal')) Utils.hideModal(m.id);
+      });
+    });
+  </script>
+</body>
+              </html>
