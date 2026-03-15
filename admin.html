@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#E30613">
+  <title>Admin - BENAION DELIVERY</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header class="header">
+      <div class="header-top">
+        <div class="logo">
+          <div class="logo-icon">
+            <i class="fas fa-motorcycle"></i>
+          </div>
+          <div class="logo-text">
+            <h1>BENAION DELIVERY</h1>
+            <p>Painel Administrativo</p>
+          </div>
+        </div>
+        <div class="header-actions">
+          <button class="header-btn" onclick="carregarNotificacoes()" title="Notificações">
+            <i class="fas fa-bell"></i>
+            <span class="badge" id="notifBadge">0</span>
+          </button>
+          <button class="header-btn" onclick="Auth.logout()" title="Sair">
+            <i class="fas fa-sign-out-alt"></i>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Conteúdo Principal -->
+    <main class="page" id="mainContent">
+      <!-- Estatísticas -->
+      <div class="stats-grid" id="statsGrid">
+        <div class="stat-card">
+          <div class="stat-value" id="statPedidosHoje">0</div>
+          <div class="stat-label">Pedidos Hoje</div>
+        </div>
+        <div class="stat-card yellow">
+          <div class="stat-value" id="statPedidosAtivos">0</div>
+          <div class="stat-label">Em Andamento</div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-value" id="statEntregadoresOnline">0</div>
+          <div class="stat-label">Entregadores Online</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="statPedidosMes">0</div>
+          <div class="stat-label">Pedidos no Mês</div>
+        </div>
+      </div>
+
+      <!-- Tabs -->
+      <div style="display: flex; gap: 8px; margin-bottom: 20px; overflow-x: auto;">
+        <button class="btn btn-small btn-primary" onclick="mostrarAba('pedidos')">
+          <i class="fas fa-list"></i> Pedidos
+        </button>
+        <button class="btn btn-small btn-outline" onclick="mostrarAba('entregadores')">
+          <i class="fas fa-users"></i> Entregadores
+        </button>
+        <button class="btn btn-small btn-outline" onclick="mostrarAba('parceiros')">
+          <i class="fas fa-store"></i> Parceiros
+        </button>
+      </div>
+
+      <!-- Aba Pedidos -->
+      <div id="abaPedidos">
+        <!-- Filtros -->
+        <div class="card">
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <button class="btn btn-small btn-secondary" onclick="filtrarPedidos('todos')">
+              Todos
+            </button>
+            <button class="btn btn-small btn-outline" onclick="filtrarPedidos('recebido')">
+              Novos
+            </button>
+            <button class="btn btn-small btn-outline" onclick="filtrarPedidos('aguardando_entregador')">
+              Aguardando
+            </button>
+            <button class="btn btn-small btn-outline" onclick="filtrarPedidos('em_entrega')">
+              Em Entrega
+            </button>
+            <button class="btn btn-small btn-outline" onclick="filtrarPedidos('finalizado')">
+              Finalizados
+            </button>
+          </div>
+        </div>
+
+        <!-- Lista de Pedidos -->
+        <div id="listaPedidos"></div>
+      </div>
+
+      <!-- Aba Entregadores -->
+      <div id="abaEntregadores" class="hidden">
+        <div id="listaEntregadores"></div>
+      </div>
+
+      <!-- Aba Parceiros -->
+      <div id="abaParceiros" class="hidden">
+        <button class="btn btn-primary mb-2" onclick="Utils.showModal('novoParceiro Modal')">
+          <i class="fas fa-plus"></i> Novo Parceiro
+        </button>
+        <div id="listaParceiros"></div>
+      </div>
+    </main>
+
+    <!-- Navegação Inferior -->
+    <nav class="bottom-nav">
+      <button class="nav-item active" onclick="mostrarAba('pedidos')">
+        <i class="fas fa-list"></i>
+        <span>Pedidos</span>
+      </button>
+      <button class="nav-item" onclick="Utils.showModal('novoPedidoModal')">
+        <i class="fas fa-plus-circle"></i>
+        <span>Novo Pedido</span>
+      </button>
+      <button class="nav-item" onclick="mostrarAba('entregadores')">
+        <i class="fas fa-users"></i>
+        <span>Entregadores</span>
+      </button>
+      <button class="nav-item" onclick="mostrarAba('parceiros')">
+        <i class="fas fa-store"></i>
+        <span>Parceiros</span>
+      </button>
+    </nav>
+  </div>
+
+  <!-- Modal Novo Pedido -->
+  <div class="modal" id="novoPedidoModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">📋 Novo Pedido</h3>
+        <button class="modal-close" onclick="Utils.hideModal('novoPedidoModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="novoPedidoForm" onsubmit="criarNovoPedido(event)">
+          <div class="form-group">
+            <label class="form-label">Nome do Cliente *</label>
+            <input type="text" class="form-control" id="pedidoNome" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Endereço de Retirada *</label>
+            <input type="text" class="form-control" id="pedidoRetirada" required placeholder="Ex: Padaria Central, Rua A, 123">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Produto *</label>
+            <input type="text" class="form-control" id="pedidoProduto" required placeholder="Ex: 1 Bolo, 2 Refrigerantes">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Valor (R$) *</label>
+            <input type="number" class="form-control" id="pedidoValor" required step="0.01" min="0" placeholder="0.00">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Endereço de Entrega *</label>
+            <input type="text" class="form-control" id="pedidoEntrega" required placeholder="Rua, número, complemento">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Bairro *</label>
+            <select class="form-control" id="pedidoBairro" required>
+              <option value="">Selecione...</option>
+              <option value="Laranjal do Jari">Laranjal do Jari</option>
+              <option value="Monte Dourado">Monte Dourado</option>
+              <option value="Vitória do Jari">Vitória do Jari</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Forma de Pagamento *</label>
+            <select class="form-control" id="pedidoPagamento" required onchange="toggleTroco()">
+              <option value="pix">PIX</option>
+              <option value="cartao">Cartão</option>
+              <option value="dinheiro">Dinheiro</option>
+            </select>
+          </div>
+
+          <div class="form-group" id="trocoGroup" style="display: none;">
+            <label class="form-label">Troco para quanto? (R$)</label>
+            <input type="number" class="form-control" id="pedidoTroco" step="0.01" min="0" placeholder="0.00">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Agendar para (Opcional)</label>
+            <input type="datetime-local" class="form-control" id="pedidoAgendar">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Observações</label>
+            <textarea class="form-control" id="pedidoObs" placeholder="Informações adicionais..."></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Parceiro (Opcional)</label>
+            <select class="form-control" id="pedidoParceiro">
+              <option value="">Sem parceiro</option>
+            </select>
+          </div>
+
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-check"></i> Criar Pedido
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Detalhes do Pedido -->
+  <div class="modal" id="detalhesPedidoModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">📦 Detalhes do Pedido</h3>
+        <button class="modal-close" onclick="Utils.hideModal('detalhesPedidoModal')">&times;</button>
+      </div>
+      <div class="modal-body" id="detalhesPedidoContent">
+        <!-- Conteúdo dinâmico -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Novo Parceiro -->
+  <div class="modal" id="novoParceiroModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">🏪 Novo Parceiro</h3>
+        <button class="modal-close" onclick="Utils.hideModal('novoParceiroModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="novoParceiroForm" onsubmit="criarNovoParceiro(event)">
+          <div class="form-group">
+            <label class="form-label">Nome do Comércio *</label>
+            <input type="text" class="form-control" id="parceiroNome" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Tipo de Comércio *</label>
+            <select class="form-control" id="parceiroTipo" required>
+              <option value="padaria">Padaria</option>
+              <option value="farmacia">Farmácia</option>
+              <option value="restaurante">Restaurante</option>
+              <option value="acai">Açaí</option>
+              <option value="churrascaria">Churrascaria</option>
+              <option value="outros">Outros</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Endereço *</label>
+            <input type="text" class="form-control" id="parceiroEndereco" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Telefone *</label>
+            <input type="tel" class="form-control" id="parceiroTelefone" required data-mask="phone">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Email</label>
+            <input type="email" class="form-control" id="parceiroEmail">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">
+              <input type="checkbox" id="parceiroPremium"> Parceiro Premium
+            </label>
+          </div>
+
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-check"></i> Cadastrar Parceiro
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="/js/utils.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/admin.js"></script>
+</body>
+                                 </html>
