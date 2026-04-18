@@ -4,7 +4,7 @@
 
 const API = {
   // Base URL para as APIs da tabela
-  baseURL: '/tables',
+  baseURL: 'tables',
 
   // ========================================
   // MÉTODOS GENÉRICOS
