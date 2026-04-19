@@ -7,38 +7,26 @@
   <meta name="theme-color" content="#E30613">
   <title>BENAION DELIVERY - Login</title>
   
-  <!-- PWA -->
   <link rel="manifest" href="manifest.json">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   
-  <!-- CSS -->
   <link rel="stylesheet" href="css/style.css">
   
-  <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
   <div class="login-page">
-    <!-- Logo -->
-    <div class="login-logo" style="margin-bottom: 30px;">
-  <img src="https://i.postimg.cc/T2Vt53JP/Vermelho-delivery-logo-20260227-011329-0005.png" 
-       alt="Benaion Delivery" 
-       style="width: 180px; height: 180px; border-radius: 50%; border: 4px solid var(--primary-yellow); object-fit: cover; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
-  <h1 style="color: white; margin-top: 15px; font-size: 28px;">BENAION DELIVERY</h1>
-  <p style="color: white; opacity: 0.9;">Conectando você ao que precisa, rápido e seguro</p>
-</div>
-
-      <h1>BENAION DELIVERY</h1>
-      <p>Conectando você ao que precisa, rápido e seguro</p>
+    <div class="login-logo" style="margin-bottom: 30px; text-align: center;">
+      <img src="https://i.postimg.cc/T2Vt53JP/Vermelho-delivery-logo-20260227-011329-0005.png" 
+           alt="Benaion Delivery" 
+           style="width: 180px; height: 180px; border-radius: 50%; border: 4px solid var(--primary-yellow); object-fit: cover; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
     </div>
 
-    <!-- Card de Login -->
     <div class="login-card">
       <h2 style="text-align: center; margin-bottom: 24px; color: var(--dark);">Entrar</h2>
 
-      <!-- Login com Google -->
       <button class="btn btn-white" onclick="handleGoogleLogin()">
         <i class="fab fa-google"></i>
         Continuar com Google
@@ -46,28 +34,15 @@
 
       <div class="divider">ou</div>
 
-      <!-- Formulário de Login -->
       <form id="loginForm" onsubmit="handleEmailLogin(event)">
         <div class="form-group">
           <label class="form-label">Email</label>
-          <input 
-            type="email" 
-            class="form-control" 
-            id="email" 
-            placeholder="seu@email.com"
-            required
-          >
+          <input type="email" class="form-control" id="email" placeholder="seu@email.com" required>
         </div>
 
         <div class="form-group">
           <label class="form-label">Senha</label>
-          <input 
-            type="password" 
-            class="form-control" 
-            id="password" 
-            placeholder="••••••••"
-            required
-          >
+          <input type="password" class="form-control" id="password" placeholder="••••••••" required>
         </div>
 
         <button type="submit" class="btn btn-primary">
@@ -78,42 +53,18 @@
 
       <div class="divider">não tem conta?</div>
 
-      <!-- Botão Registrar -->
       <button class="btn btn-outline" onclick="Utils.showModal('registerModal')">
         <i class="fas fa-user-plus"></i>
         Criar Conta
       </button>
-
-      <!-- Login Rápido para Demo -->
-      <div style="margin-top: 32px; padding-top: 24px; border-top: 2px solid var(--light-gray);">
-        <p style="text-align: center; color: var(--gray); font-size: 14px; margin-bottom: 16px;">
-          <i class="fas fa-bolt"></i> Acesso Rápido (Demo)
-        </p>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-          <button class="btn btn-small btn-secondary" onclick="quickLogin('admin')">
-            👑 Admin
-          </button>
-          <button class="btn btn-small btn-secondary" onclick="quickLogin('entregador')">
-            🛵 Entregador
-          </button>
-          <button class="btn btn-small btn-secondary" onclick="quickLogin('parceiro')">
-            🏪 Parceiro
-          </button>
-          <button class="btn btn-small btn-secondary" onclick="quickLogin('cliente')">
-            👤 Cliente
-          </button>
-        </div>
-      </div>
     </div>
 
-    <!-- Informações -->
     <div style="text-align: center; margin-top: 24px; color: var(--white); opacity: 0.9;">
       <p style="font-size: 13px;">Laranjal do Jari • Monte Dourado</p>
       <p style="font-size: 12px; margin-top: 8px;">v1.0.0</p>
     </div>
   </div>
 
-  <!-- Modal de Registro -->
   <div class="modal" id="registerModal">
     <div class="modal-content">
       <div class="modal-header">
@@ -124,37 +75,12 @@
         <form id="registerForm" onsubmit="handleRegister(event)">
           <div class="form-group">
             <label class="form-label">Nome Completo</label>
-            <input 
-              type="text" 
-              class="form-control" 
-              id="registerName" 
-              placeholder="Seu nome"
-              required
-            >
+            <input type="text" class="form-control" id="registerName" placeholder="Seu nome" required>
           </div>
-
           <div class="form-group">
             <label class="form-label">Email</label>
-            <input 
-              type="email" 
-              class="form-control" 
-              id="registerEmail" 
-              placeholder="seu@email.com"
-              required
-            >
+            <input type="email" class="form-control" id="registerEmail" placeholder="seu@email.com" required>
           </div>
-
-          <div class="form-group">
-            <label class="form-label">Telefone</label>
-            <input 
-              type="tel" 
-              class="form-control" 
-              id="registerPhone" 
-              placeholder="(00) 00000-0000"
-              data-mask="phone"
-            >
-          </div>
-
           <div class="form-group">
             <label class="form-label">Tipo de Conta</label>
             <select class="form-control" id="registerUserType" required>
@@ -163,31 +89,10 @@
               <option value="parceiro">Parceiro/Comerciante</option>
             </select>
           </div>
-
           <div class="form-group">
             <label class="form-label">Senha</label>
-            <input 
-              type="password" 
-              class="form-control" 
-              id="registerPassword" 
-              placeholder="Mínimo 6 caracteres"
-              required
-              minlength="6"
-            >
+            <input type="password" class="form-control" id="registerPassword" placeholder="Mínimo 6 caracteres" required minlength="6">
           </div>
-
-          <div class="form-group">
-            <label class="form-label">Confirmar Senha</label>
-            <input 
-              type="password" 
-              class="form-control" 
-              id="registerPasswordConfirm" 
-              placeholder="Digite a senha novamente"
-              required
-              minlength="6"
-            >
-          </div>
-
           <button type="submit" class="btn btn-primary">
             <i class="fas fa-check"></i>
             Criar Conta
@@ -197,200 +102,61 @@
     </div>
   </div>
 
-  <!-- Scripts -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getAuth } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCl-U9X9qxohjDpgr8y2pdkS3j-qNm19pk",
+      authDomain: "benaion-delivery.firebaseapp.com",
+      projectId: "benaion-delivery",
+      storageBucket: "benaion-delivery.firebasestorage.app",
+      messagingSenderId: "309927409217",
+      appId: "1:309927409217:web:7a105cb5237b2294b1b8c0",
+      measurementId: "G-TK1KNW14WH"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    window.db = getFirestore(app);
+    window.auth = getAuth(app);
+    console.log("Firebase conectado com sucesso!");
+  </script>
+
   <script src="js/utils.js"></script>
-<script src="js/api.js"></script>
-<script src="js/auth.js"></script>
-<script src="js/entregador.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
 
-  
   <script>
-    // Verificar se já está logado
-    if (Auth.isAuthenticated()) {
-      Auth.redirectToDashboard();
-    }
-
-    // Registrar Service Worker
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('service-worker.js')
-        .then(() => console.log('Service Worker registrado'))
-        .catch(err => console.error('Erro ao registrar Service Worker:', err));
-    }
-
-    // ========================================
-    // LOGIN COM EMAIL
-    // ========================================
+    // Funções de controle de UI
     async function handleEmailLogin(event) {
       event.preventDefault();
-      
       const email = document.getElementById('email').value;
       const password = document.getElementById('password').value;
-      
-      const btn = event.target.querySelector('button[type="submit"]');
-      btn.disabled = true;
-      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Entrando...';
-
       try {
         await Auth.loginWithEmail(email, password);
-        Utils.showToast('Login realizado com sucesso!', 'success');
-        setTimeout(() => {
-          Auth.redirectToDashboard();
-        }, 500);
+        Auth.redirectToDashboard();
       } catch (error) {
-        Utils.showToast(error.message || 'Erro ao fazer login', 'error');
-        btn.disabled = false;
-        btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Entrar';
+        Utils.showToast(error.message, 'error');
       }
     }
 
-    // ========================================
-    // LOGIN COM GOOGLE
-    // ========================================
-    async function handleGoogleLogin() {
-      try {
-        await Auth.loginWithGoogle();
-      } catch (error) {
-        Utils.showToast('Erro ao fazer login com Google', 'error');
-      }
-    }
-
-    // ========================================
-    // REGISTRO
-    // ========================================
     async function handleRegister(event) {
       event.preventDefault();
-      
-      const name = document.getElementById('registerName').value;
-      const email = document.getElementById('registerEmail').value;
-      const phone = document.getElementById('registerPhone').value;
-      const userType = document.getElementById('registerUserType').value;
-      const password = document.getElementById('registerPassword').value;
-      const passwordConfirm = document.getElementById('registerPasswordConfirm').value;
-
-      // Validar senhas
-      if (password !== passwordConfirm) {
-        Utils.showToast('As senhas não coincidem', 'error');
-        return;
-      }
-
-      const btn = event.target.querySelector('button[type="submit"]');
-      btn.disabled = true;
-      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Criando conta...';
-
-      try {
-        await Auth.register({
-          name,
-          email,
-          phone,
-          userType,
-          password
-        });
-
-        Utils.showToast('Conta criada com sucesso!', 'success');
-        Utils.hideModal('registerModal');
-        
-        setTimeout(() => {
-          Auth.redirectToDashboard();
-        }, 500);
-      } catch (error) {
-        Utils.showToast(error.message || 'Erro ao criar conta', 'error');
-        btn.disabled = false;
-        btn.innerHTML = '<i class="fas fa-check"></i> Criar Conta';
-      }
-    }
-
-    // ========================================
-    // LOGIN RÁPIDO (DEMO)
-    // ========================================
-    async function quickLogin(userType) {
-      // Criar usuários demo se não existirem
-      const demoUsers = {
-        admin: {
-          name: 'Administrador Benaion',
-          email: 'admin@benaion.com',
-          password: 'admin123',
-          phone: '(96) 99999-0001',
-          userType: 'admin',
-          status: 'ativo',
-          address: 'Laranjal do Jari - AP',
-          photo: '',
-          online: false,
-          totalDeliveries: 0
-        },
-        entregador: {
-          name: 'João Silva',
-          email: 'entregador@benaion.com',
-          password: 'entregador123',
-          phone: '(96) 99999-0002',
-          userType: 'entregador',
-          status: 'ativo',
-          address: 'Laranjal do Jari - AP',
-          photo: '',
-          online: false,
-          totalDeliveries: 145
-        },
-        parceiro: {
-          name: 'Maria Santos',
-          email: 'parceiro@benaion.com',
-          password: 'parceiro123',
-          phone: '(96) 99999-0003',
-          userType: 'parceiro',
-          status: 'ativo',
-          address: 'Padaria Central - Laranjal do Jari',
-          photo: '',
-          online: false,
-          totalDeliveries: 0
-        },
-        cliente: {
-          name: 'Carlos Oliveira',
-          email: 'cliente@benaion.com',
-          password: 'cliente123',
-          phone: '(96) 99999-0004',
-          userType: 'cliente',
-          status: 'ativo',
-          address: 'Rua das Flores, 123 - Laranjal do Jari',
-          photo: '',
-          online: false,
-          totalDeliveries: 0
-        }
+      const data = {
+        name: document.getElementById('registerName').value,
+        email: document.getElementById('registerEmail').value,
+        userType: document.getElementById('registerUserType').value,
+        password: document.getElementById('registerPassword').value
       };
-
       try {
-        const userData = demoUsers[userType];
-        
-        // Tentar fazer login
-        try {
-          await Auth.loginWithEmail(userData.email, userData.password);
-        } catch (error) {
-          // Se não existir, criar usuário
-          await API.createUser(userData);
-          await Auth.loginWithEmail(userData.email, userData.password);
-        }
-
-        Utils.showToast(`Login como ${userType} realizado!`, 'success');
-        setTimeout(() => {
-          Auth.redirectToDashboard();
-        }, 500);
+        await Auth.register(data);
+        Utils.showToast('Conta criada!', 'success');
+        Auth.redirectToDashboard();
       } catch (error) {
-        console.error('Erro no login rápido:', error);
-        Utils.showToast('Erro ao fazer login rápido', 'error');
+        Utils.showToast(error.message, 'error');
       }
     }
-
-    // Fechar modal ao clicar fora
-    document.getElementById('registerModal').addEventListener('click', (e) => {
-      if (e.target.classList.contains('modal')) {
-        Utils.hideModal('registerModal');
-      }
-    });
-  
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/service-worker.js')
-        .then(reg => console.log('Service Worker ativo!', reg))
-        .catch(err => console.log('Erro ao registar SW:', err));
-    });
-  }
   </script>
 </body>
 </html>
