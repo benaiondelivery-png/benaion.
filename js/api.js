@@ -46,7 +46,7 @@ const Auth = {
   },
   redirectToDashboard() {
     const user = JSON.parse(localStorage.getItem('benaion_user'));
-    if (user) window.location.href = `${user.userType}.html`;
+    if (user) window.location.href = ${user.userType}.html;
   }
 };
 
