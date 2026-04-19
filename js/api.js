@@ -83,7 +83,7 @@ const API = {
       pedidosAtivos: pedidos.filter(p => !['finalizado', 'cancelado'].includes(p.status)).length
     };
   }
-};
 
 window.API = API;
+
 
