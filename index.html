@@ -141,21 +141,38 @@
     }
 
     async function handleRegister(event) {
-      event.preventDefault();
-      const data = {
-        name: document.getElementById('registerName').value,
-        email: document.getElementById('registerEmail').value,
-        userType: document.getElementById('registerUserType').value,
-        password: document.getElementById('registerPassword').value
-      };
-      try {
-        await window.Auth.register(data);
-        Utils.showToast('Conta criada!', 'success');
-        window.Auth.redirectToDashboard();
-      } catch (error) {
-        Utils.showToast(error.message, 'error');
-      }
-    }
+  event.preventDefault();
+  
+  // Pegando os dados do formulário
+  const data = {
+    name: document.getElementById('registerName').value,
+    email: document.getElementById('registerEmail').value,
+    userType: document.getElementById('registerUserType').value,
+    password: document.getElementById('registerPassword').value
+  };
+
+  const btn = event.target.querySelector('button[type="submit"]');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Criando...';
+
+  try {
+    // AQUI ESTÁ A MUDANÇA: usando window.Auth
+    await window.Auth.register(data);
+    
+    Utils.showToast('Conta criada com sucesso!', 'success');
+    
+    // Pequeno tempo para o usuário ler a mensagem antes de mudar de página
+    setTimeout(() => {
+      window.Auth.redirectToDashboard();
+    }, 1000);
+    
+  } catch (error) {
+    Utils.showToast(error.message || 'Erro ao criar conta', 'error');
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-check"></i> Criar Conta';
+  }
+}
+
   </script>
 </body>
 </html>
