@@ -1,5 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getFirestore, collection, addDoc, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { getFirestore, collection, addDoc, getDocs, query, where, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCl-U9X9qxohjDpgr8y2pdkS3j-qNm19pk",
@@ -14,27 +15,26 @@ const firebaseConfig = {
 // Inicialização
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const auth = getAuth(app);
+const googleProvider = new GoogleAuthProvider();
 
 const API = {
   async createUser(data) {
     try {
-      // Garantia de que os dados estão vindo preenchidos do HTML
-      if (!data.name || !data.email) {
-        throw new Error("Os dados do formulário estão chegando vazios na API.");
-      }
+      if (!data.name || !data.email) throw new Error("Dados incompletos.");
 
       const docRef = await addDoc(collection(db, "users"), {
         name: data.name,
         email: data.email,
-        password: data.password,
-        userType: data.userType,
+        password: data.password || "", // Google não tem senha no banco
+        userType: data.userType || "cliente",
         created_at: new Date().toISOString()
       });
 
       return { id: docRef.id, ...data };
     } catch (e) {
-      console.error("Erro no Firestore (createUser):", e);
-      throw e; // Lança o erro real para o index.html exibir
+      console.error("Erro ao criar usuário:", e);
+      throw e;
     }
   },
   
@@ -45,13 +45,39 @@ const API = {
       if (querySnapshot.empty) return null;
       return { id: querySnapshot.docs[0].id, ...querySnapshot.docs[0].data() };
     } catch (e) {
-      console.error("Erro no Firestore (getUserByEmail):", e);
-      throw new Error("Erro ao consultar usuário.");
+      throw new Error("Erro ao consultar banco de dados.");
     }
   }
 };
 
 const Auth = {
+  async loginWithGoogle() {
+    try {
+      const result = await signInWithPopup(auth, googleProvider);
+      const userGoogle = result.user;
+
+      // 1. Verifica se já tem perfil no Firestore
+      let userProfile = await API.getUserByEmail(userGoogle.email);
+
+      // 2. Se não existir, cria um perfil automático de CLIENTE
+      if (!userProfile) {
+        userProfile = await API.createUser({
+          name: userGoogle.displayName,
+          email: userGoogle.email,
+          userType: "cliente",
+          password: "login_google"
+        });
+      }
+
+      localStorage.setItem('benaion_user', JSON.stringify(userProfile));
+      window.location.href = "cliente.html";
+      return userProfile;
+    } catch (error) {
+      console.error("Erro Google Auth:", error);
+      throw new Error("Falha no login com Google.");
+    }
+  },
+
   async loginWithEmail(email, password) {
     const user = await API.getUserByEmail(email);
     if (!user || user.password !== password) throw new Error('E-mail ou senha incorretos');
@@ -60,11 +86,7 @@ const Auth = {
   },
   
   async register(data) {
-    // Verificação antes de chamar o Firebase
-    if (!data.email || !data.password || !data.name) {
-      throw new Error("Preencha todos os campos corretamente.");
-    }
-    
+    if (!data.email || !data.password || !data.name) throw new Error("Preencha tudo!");
     const user = await API.createUser(data);
     localStorage.setItem('benaion_user', JSON.stringify(user));
     return user;
@@ -77,15 +99,10 @@ const Auth = {
     } else {
       window.location.href = 'index.html';
     }
-  },
-
-  getCurrentUser() {
-    return JSON.parse(localStorage.getItem('benaion_user'));
   }
 };
 
 // EXPOSIÇÃO GLOBAL
 window.API = API;
 window.Auth = Auth;
-
-console.log("Benaion API v1.4 carregada!");
+console.log("Benaion API v1.5 - Google Auth Ativo!");
