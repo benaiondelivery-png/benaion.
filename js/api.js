@@ -46,8 +46,10 @@ const Auth = {
 },
 
   redirectToDashboard() {
-    const user = JSON.parse(localStorage.getItem('benaion_user'));
-    if (user) window.location.href = \${user.userType}.html`;`
+  const user = JSON.parse(localStorage.getItem('benaion_user'));
+  if (user) {
+    // AS CRASES VÃO AQUI, ENVOLVENDO TODO O LINK:
+    window.location.href = `${user.userType}.html`; 
   }
 };
 
