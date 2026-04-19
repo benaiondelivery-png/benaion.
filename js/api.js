@@ -39,14 +39,15 @@ const Auth = {
     localStorage.setItem('benaion_user', JSON.stringify(user));
     return user;
   },
-  async register(data) {
-    const user = await API.createUser(data);
-    localStorage.setItem('benaion_user', JSON.stringify(user));
-    return user;
-  },
+  async register(data) { // Adicione o async aqui
+  const user = await API.createUser(data); // O await já está aqui
+  localStorage.setItem('benaion_user', JSON.stringify(user));
+  return user;
+},
+
   redirectToDashboard() {
     const user = JSON.parse(localStorage.getItem('benaion_user'));
-    if (user) window.location.href = `${user.userType}.html`;
+    if (user) window.location.href = ${user.userType}.html;
   }
 };
 
