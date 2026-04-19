@@ -2,31 +2,55 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="theme-color" content="#E30613">
   <title>Entregador - BENAION DELIVERY</title>
+  
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="manifest" href="manifest.json">
+
+  <style>
+    /* Ajustes de Interface Benaion */
+    :root {
+      --status-online: #2ecc71;
+      --status-offline: #ccc;
+    }
+    .hidden { display: none !important; }
+    .status-dot { font-size: 12px; margin-right: 5px; }
+    .online { color: var(--status-online); }
+    .offline { color: var(--status-offline); }
+    
+    /* Card de Pedido Estilizado */
+    .pedido-card {
+      background: white;
+      border-radius: 12px;
+      padding: 15px;
+      margin-bottom: 15px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      border-left: 5px solid var(--primary-red);
+    }
+  </style>
 </head>
 <body>
+
   <div class="container">
     <header class="header">
       <div class="header-top">
         <div class="logo">
           <div class="logo-icon">
-            <img src="https://i.postimg.cc/T2Vt53JP/Vermelho-delivery-logo-20260227-011329-0005.png" alt="Logo Benaion" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
+            <img src="https://i.postimg.cc/T2Vt53JP/Vermelho-delivery-logo-20260227-011329-0005.png" alt="Benaion">
           </div>
           <div class="logo-text">
             <h1 id="entregadorNome">Carregando...</h1>
-            <p>Painel de Entregas</p>
+            <p id="txtStatus"><i class="fas fa-circle status-dot"></i> Offline</p>
           </div>
         </div>
         <div class="header-actions">
-          <button class="header-btn" id="btnStatus" onclick="toggleStatus()" title="Status">
-            <i class="fas fa-circle"></i>
+          <button class="header-btn" id="btnStatusHeader" onclick="toggleStatus()">
+            <i class="fas fa-power-off"></i>
           </button>
-          <button class="header-btn" onclick="window.Auth.logout()" title="Sair">
+          <button class="header-btn" onclick="Auth.logout()">
             <i class="fas fa-sign-out-alt"></i>
           </button>
         </div>
@@ -35,81 +59,158 @@
 
     <main class="page" id="mainContent">
       <div class="card" style="background: linear-gradient(135deg, var(--primary-red) 0%, #c00510 100%); color: white; margin-bottom: 20px;">
-        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; text-align: center;">
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; text-align: center;">
           <div>
-            <div style="font-size: 28px; font-weight: 700;" id="statHoje">0</div>
-            <div style="font-size: 12px; opacity: 0.9;">Hoje</div>
+            <div style="font-size: 22px; font-weight: 700;" id="statHoje">0</div>
+            <div style="font-size: 11px; opacity: 0.9;">Hoje</div>
           </div>
           <div>
-            <div style="font-size: 28px; font-weight: 700;" id="statSemana">0</div>
-            <div style="font-size: 12px; opacity: 0.9;">Semana</div>
+            <div style="font-size: 22px; font-weight: 700;" id="statSemana">0</div>
+            <div style="font-size: 11px; opacity: 0.9;">Semana</div>
           </div>
           <div>
-            <div style="font-size: 28px; font-weight: 700;" id="statMes">0</div>
-            <div style="font-size: 12px; opacity: 0.9;">Mês</div>
+            <div style="font-size: 22px; font-weight: 700;" id="statSaldo">R$ 0</div>
+            <div style="font-size: 11px; opacity: 0.9;">Ganhos</div>
           </div>
         </div>
       </div>
 
       <div style="display: flex; gap: 8px; margin-bottom: 20px;">
-        <button class="btn btn-small btn-primary" onclick="mostrarAba('disponiveis')">Disponíveis</button>
-        <button class="btn btn-small btn-outline" onclick="mostrarAba('minhas')">Minhas</button>
+        <button id="btnTabDisp" class="btn btn-small btn-primary" onclick="mostrarAba('disponiveis')">Disponíveis</button>
+        <button id="btnTabMinhas" class="btn btn-small btn-outline" onclick="mostrarAba('minhas')">Minhas</button>
       </div>
 
-      <div id="abaDisponiveis"><div id="listaPedidosDisponiveis"></div></div>
-      <div id="abaMinhas" class="hidden"><div id="listaMinhasEntregas"></div></div>
+      <div id="abaDisponiveis">
+        <div id="listaPedidosDisponiveis">
+          </div>
+      </div>
+      
+      <div id="abaMinhas" class="hidden">
+        <div id="listaMinhasEntregas">
+          <p style="text-align: center; color: #999; margin-top: 20px;">Nenhuma entrega aceita.</p>
+        </div>
+      </div>
     </main>
 
     <nav class="bottom-nav">
-      <button class="nav-item active" onclick="mostrarAba('disponiveis')"><i class="fas fa-inbox"></i><span>Disponíveis</span></button>
-      <button class="nav-item" onclick="mostrarAba('minhas')"><i class="fas fa-tasks"></i><span>Minhas</span></button>
-      <button class="nav-item" id="navStatus" onclick="toggleStatus()"><i class="fas fa-circle"></i><span>Offline</span></button>
+      <button class="nav-item active" onclick="mostrarAba('disponiveis')">
+        <i class="fas fa-motorcycle"></i><span>Início</span>
+      </button>
+      <button class="nav-item" onclick="Utils.showToast('Calculadora de Taxas em breve')">
+        <i class="fas fa-calculator"></i><span>Taxas</span>
+      </button>
+      <button class="nav-item" onclick="toggleStatus()">
+        <i class="fas fa-circle" id="navIconStatus"></i><span id="navTextStatus">Offline</span>
+      </button>
     </nav>
   </div>
 
   <script src="js/utils.js"></script>
-  <script type="module" src="js/api.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
   
   <script>
+    // TABELA OFICIAL DE TAXAS (TOT) INTEGRADA
+    const TABELA_TAXAS = {
+      "Agreste": 5.00, "Nova esperança": 6.00, "Prosperidade": 6.00,
+      "Castanheira": 6.00, "Cajari": 7.00, "Rodovia do gogó": 7.00,
+      "Buritizal": 7.00, "Sarney": 8.00, "Nazaré mineiro": 10.00,
+      "Centro": 6.00, "Mirilandia": 6.00, "Rio branco": 7.00,
+      "José cesário": 6.00, "Malvinas": 8.00, "Samaúma": 15.00,
+      "Monte dourado": 30.00
+    };
+
     let currentUser = null;
 
-    // Função de inicialização
-    async function initEntregador() {
-      if (window.Auth) {
-        try {
-          // Protege a página para apenas entregadores
-          window.Auth.requireAuth(['entregador']);
-          currentUser = window.Auth.getCurrentUser();
-          
-          if (currentUser) {
-            document.getElementById('entregadorNome').textContent = currentUser.name.split(' ')[0];
-            // Aqui você chamaria as funções de carregar entregas que estão no entregador.js ou api.js
-          }
-        } catch (error) {
-          console.error("Erro ao validar entregador:", error);
+    async function init() {
+      if (typeof Auth !== 'undefined') {
+        if (Auth.requireAuth(['entregador'])) {
+          currentUser = Auth.getCurrentUser();
+          document.getElementById('entregadorNome').textContent = currentUser.name.split(' ')[0];
+          sincronizarStatus(currentUser.online);
+          renderizarPedidosSimulados();
         }
       } else {
-        setTimeout(initEntregador, 500);
+        setTimeout(init, 300);
       }
     }
 
-    document.addEventListener('DOMContentLoaded', initEntregador);
-
-    // Funções de interface simples
-    function mostrarAba(aba) {
-      document.getElementById('abaDisponiveis').classList.toggle('hidden', aba !== 'disponiveis');
-      document.getElementById('abaMinhas').classList.toggle('hidden', aba !== 'minhas');
-    }
-
-    function toggleStatus() {
-      const btn = document.getElementById('btnStatus');
-      const nav = document.querySelector('#navStatus span');
-      const isOffline = btn.style.color === 'rgb(204, 204, 204)' || btn.style.color === '';
+    // Função para calcular taxa baseada na sua lógica
+    function calcularTaxaBenaion(retirada, entrega) {
+      const baseAgreste = 5.00;
+      const vRetirada = TABELA_TAXAS[retirada] || baseAgreste;
+      const vEntrega = TABELA_TAXAS[entrega] || baseAgreste;
       
-      btn.style.color = isOffline ? '#2ecc71' : '#ccc';
-      nav.textContent = isOffline ? 'Online' : 'Offline';
-      Utils.showToast(isOffline ? "Você está Online!" : "Você está Offline", "info");
+      // Regra: Retirada + Diferença da Base
+      return vRetirada + (vEntrega - baseAgreste);
     }
+
+    function sincronizarStatus(isOnline) {
+      const dot = document.querySelector('.status-dot');
+      const txt = document.getElementById('txtStatus');
+      const iconNav = document.getElementById('navIconStatus');
+      const textNav = document.getElementById('navTextStatus');
+      const btnHeader = document.getElementById('btnStatusHeader');
+
+      if (isOnline) {
+        dot.className = "fas fa-circle status-dot online";
+        txt.innerHTML = '<i class="fas fa-circle status-dot online"></i> Disponível';
+        iconNav.style.color = "#2ecc71";
+        textNav.textContent = "Online";
+        btnHeader.style.color = "#2ecc71";
+      } else {
+        dot.className = "fas fa-circle status-dot offline";
+        txt.innerHTML = '<i class="fas fa-circle status-dot offline"></i> Offline';
+        iconNav.style.color = "#ccc";
+        textNav.textContent = "Offline";
+        btnHeader.style.color = "#ccc";
+      }
+    }
+
+    async function toggleStatus() {
+      const novoStatus = !currentUser.online;
+      currentUser.online = novoStatus;
+      Auth.setCurrentUser(currentUser);
+      sincronizarStatus(novoStatus);
+      
+      if(window.API) {
+        API.updateUser(currentUser.id, { online: novoStatus }).catch(() => {});
+      }
+      
+      Utils.showToast(novoStatus ? "Você está Online!" : "Você está Offline");
+    }
+
+    function mostrarAba(aba) {
+      const isDisp = aba === 'disponiveis';
+      document.getElementById('abaDisponiveis').classList.toggle('hidden', !isDisp);
+      document.getElementById('abaMinhas').classList.toggle('hidden', isDisp);
+      document.getElementById('btnTabDisp').className = isDisp ? 'btn btn-small btn-primary' : 'btn btn-small btn-outline';
+      document.getElementById('btnTabMinhas').className = isDisp ? 'btn btn-small btn-outline' : 'btn btn-small btn-primary';
+    }
+
+    // Exemplo de como os pedidos aparecerão com a taxa automática
+    function renderizarPedidosSimulados() {
+      const lista = document.getElementById('listaPedidosDisponiveis');
+      const taxaExemplo = calcularTaxaBenaion("Cajari", "Malvinas"); // R$ 9,00 conforme seu exemplo
+
+      lista.innerHTML = `
+        <div class="pedido-card">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <div>
+              <small style="color: #666;">Retirada: <b>Cajari</b></small><br>
+              <small style="color: #666;">Entrega: <b>Malvinas</b></small>
+            </div>
+            <div style="text-align: right;">
+              <span style="color: var(--primary-red); font-weight: bold; font-size: 18px;">R$ ${taxaExemplo.toFixed(2)}</span>
+            </div>
+          </div>
+          <hr style="margin: 10px 0; border: 0; border-top: 1px solid #eee;">
+          <button class="btn btn-primary" style="width: 100%;" onclick="Utils.showToast('Aceitando pedido...')">Aceitar Entrega</button>
+        </div>
+      `;
+    }
+
+    document.addEventListener('DOMContentLoaded', init);
   </script>
 </body>
 </html>
