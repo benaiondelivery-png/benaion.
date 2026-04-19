@@ -1,35 +1,28 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getFirestore, collection, addDoc, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-// Configuração atualizada com as suas chaves novas
+// Configuração que enviaste para o Benaion.D.Lj
 const firebaseConfig = {
-  apiKey: "AIzaSyBHokOvVml6hxvzJYVJX9ppx1Wr1mDn11g",
+  apiKey: "AIzaSyCl-U9X9qxohjDpgr8y2pdkS3j-qNm19pk",
   authDomain: "benaion-delivery.firebaseapp.com",
   projectId: "benaion-delivery",
   storageBucket: "benaion-delivery.firebasestorage.app",
   messagingSenderId: "309927409217",
-  appId: "1:309927409217:web:10e7e2b951fa4ad0b1b8c0",
-  measurementId: "G-FJRTLQBELJ"
+  appId: "1:309927409217:web:7a105cb5237b2294b1b8c0",
+  measurementId: "G-TK1KNW14WH"
 };
 
-// Inicializa o Firebase e o Banco de Dados
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// Objeto API para gerenciar o banco
 const API = {
   async createUser(data) {
-    try {
-      const docRef = await addDoc(collection(db, "users"), {
-        ...data,
-        status: 'ativo',
-        created_at: new Date().toISOString()
-      });
-      return { id: docRef.id, ...data };
-    } catch (e) {
-      console.error("Erro ao salvar no Firebase:", e);
-      throw new Error("Erro de conexão com o banco de dados.");
-    }
+    // Tenta salvar o utilizador no Firestore
+    const docRef = await addDoc(collection(db, "users"), {
+      ...data,
+      created_at: new Date().toISOString()
+    });
+    return { id: docRef.id, ...data };
   },
   async getUserByEmail(email) {
     const q = query(collection(db, "users"), where("email", "==", email));
@@ -39,11 +32,10 @@ const API = {
   }
 };
 
-// Objeto Auth para o Login/Registro
 const Auth = {
   async loginWithEmail(email, password) {
     const user = await API.getUserByEmail(email);
-    if (!user || user.password !== password) throw new Error('Email ou senha incorretos');
+    if (!user || user.password !== password) throw new Error('Dados incorretos');
     localStorage.setItem('benaion_user', JSON.stringify(user));
     return user;
   },
@@ -58,6 +50,5 @@ const Auth = {
   }
 };
 
-// Torna tudo visível para o seu site
 window.API = API;
 window.Auth = Auth;
