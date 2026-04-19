@@ -107,52 +107,80 @@
   <script type="module" src="js/api.js?v=1.1"></script>
 
   <script>
-    // Estas funções agora chamam o Auth que está dentro do api.js
-    async function handleEmailLogin(event) {
-      event.preventDefault();
-      const email = document.getElementById('email').value;
-      const password = document.getElementById('password').value;
-      try {
-        await window.Auth.loginWithEmail(email, password);
-        window.Auth.redirectToDashboard();
-      } catch (error) {
-        Utils.showToast(error.message, 'error');
-      }
+  // LOGIN POR E-MAIL
+  async function handleEmailLogin(event) {
+    event.preventDefault();
+    const btn = event.target.querySelector('button[type="submit"]');
+    const originalText = btn.innerHTML;
+    
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Entrando...';
+
+    try {
+      // O seu api.js exporta o objeto Auth globalmente
+      await window.Auth.login(email, password);
+      
+      // Redirecionamento baseado no tipo de usuário salvo no banco
+      const user = window.Auth.getCurrentUser();
+      redirecionarUsuario(user.userType);
+      
+    } catch (error) {
+      Utils.showToast('Falha no login: ' + error.message, 'error');
+      btn.disabled = false;
+      btn.innerHTML = originalText;
     }
-
-    async function handleRegister(event) {
-  event.preventDefault();
-  
-  // Pegando os dados do formulário
-  const data = {
-    name: document.getElementById('registerName').value,
-    email: document.getElementById('registerEmail').value,
-    userType: document.getElementById('registerUserType').value,
-    password: document.getElementById('registerPassword').value
-  };
-
-  const btn = event.target.querySelector('button[type="submit"]');
-  btn.disabled = true;
-  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Criando...';
-
-  try {
-    // AQUI ESTÁ A MUDANÇA: usando window.Auth
-    await window.Auth.register(data);
-    
-    Utils.showToast('Conta criada com sucesso!', 'success');
-    
-    // Pequeno tempo para o usuário ler a mensagem antes de mudar de página
-    setTimeout(() => {
-      window.Auth.redirectToDashboard();
-    }, 1000);
-    
-  } catch (error) {
-    Utils.showToast(error.message || 'Erro ao criar conta', 'error');
-    btn.disabled = false;
-    btn.innerHTML = '<i class="fas fa-check"></i> Criar Conta';
   }
-}
 
-  </script>
+  // CADASTRO DE NOVA CONTA
+  async function handleRegister(event) {
+    event.preventDefault();
+    
+    const btn = event.target.querySelector('button[type="submit"]');
+    const originalText = btn.innerHTML;
+
+    // Pegando os dados usando os IDs EXATOS do seu HTML
+    const nome = document.getElementById('registerName').value;
+    const email = document.getElementById('registerEmail').value;
+    const tipo = document.getElementById('registerUserType').value;
+    const senha = document.getElementById('registerPassword').value;
+
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Criando...';
+
+    try {
+      // Chama o método de registro do seu api.js
+      // Nota: Ajustamos os parâmetros para bater com o window.Auth.register
+      await window.Auth.register(email, senha, nome, tipo);
+      
+      Utils.showToast('Conta criada com sucesso!', 'success');
+      
+      setTimeout(() => {
+        redirecionarUsuario(tipo);
+      }, 1500);
+      
+    } catch (error) {
+      console.error("Erro no Firebase:", error);
+      Utils.showToast(error.message || 'Erro ao criar conta', 'error');
+      
+      // AQUI DESTRAVA O BOTÃO SE DER ERRO
+      btn.disabled = false;
+      btn.innerHTML = originalText;
+    }
+  }
+
+  // Função auxiliar para organizar as rotas da Benaion Delivery
+  function redirecionarUsuario(tipo) {
+    const rotas = {
+      'admin': 'admin.html',
+      'parceiro': 'parceiro.html',
+      'entregador': 'entregador.html',
+      'cliente': 'cliente.html'
+    };
+    window.location.href = rotas[tipo] || 'cliente.html';
+  }
+</script>
 </body>
 </html>
