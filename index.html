@@ -123,19 +123,18 @@
     console.log("Firebase conectado com sucesso!");
   </script>
 
-<script src="js/utils.js"></script>
-<script type="module" src="js/api.js"></script>
-
+  <script src="js/utils.js"></script>
+  <script type="module" src="js/api.js"></script>
 
   <script>
-    // Funções de controle de UI
+    // Estas funções agora chamam o Auth que está dentro do api.js
     async function handleEmailLogin(event) {
       event.preventDefault();
       const email = document.getElementById('email').value;
       const password = document.getElementById('password').value;
       try {
-        await Auth.loginWithEmail(email, password);
-        Auth.redirectToDashboard();
+        await window.Auth.loginWithEmail(email, password);
+        window.Auth.redirectToDashboard();
       } catch (error) {
         Utils.showToast(error.message, 'error');
       }
@@ -150,9 +149,9 @@
         password: document.getElementById('registerPassword').value
       };
       try {
-        await Auth.register(data);
+        await window.Auth.register(data);
         Utils.showToast('Conta criada!', 'success');
-        Auth.redirectToDashboard();
+        window.Auth.redirectToDashboard();
       } catch (error) {
         Utils.showToast(error.message, 'error');
       }
