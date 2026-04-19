@@ -1,7 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getFirestore, collection, addDoc, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-// Configuração que enviaste para o Benaion.D.Lj
 const firebaseConfig = {
   apiKey: "AIzaSyCl-U9X9qxohjDpgr8y2pdkS3j-qNm19pk",
   authDomain: "benaion-delivery.firebaseapp.com",
@@ -17,7 +16,6 @@ const db = getFirestore(app);
 
 const API = {
   async createUser(data) {
-    // Tenta salvar o utilizador no Firestore
     const docRef = await addDoc(collection(db, "users"), {
       ...data,
       created_at: new Date().toISOString()
@@ -39,19 +37,18 @@ const Auth = {
     localStorage.setItem('benaion_user', JSON.stringify(user));
     return user;
   },
-  async register(data) { // Adicione o async aqui
-  const user = await API.createUser(data); // O await já está aqui
-  localStorage.setItem('benaion_user', JSON.stringify(user));
-  return user;
-},
-
+  async register(data) {
+    const user = await API.createUser(data);
+    localStorage.setItem('benaion_user', JSON.stringify(user));
+    return user;
+  },
   redirectToDashboard() {
-  const user = JSON.parse(localStorage.getItem('benaion_user'));
-  if (user) {
-    // AS CRASES VÃO AQUI, ENVOLVENDO TODO O LINK:
-    window.location.href = `${user.userType}.html`; 
+    const user = JSON.parse(localStorage.getItem('benaion_user'));
+    if (user) {
+      window.location.href = `${user.userType}.html`; 
+    }
   }
-};
+}; // CHAVE DE FECHAMENTO QUE FALTAVA AQUI
 
 window.API = API;
 window.Auth = Auth;
