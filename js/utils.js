@@ -1,5 +1,5 @@
 // ========================================
-// BENAION DELIVERY - UTILITÁRIOS
+// BENAION DELIVERY - UTILITÁRIOS (V1.7.0)
 // ========================================
 
 const Utils = {
@@ -17,10 +17,16 @@ const Utils = {
     const toast = document.createElement('div');
     toast.className = `toast ${type}`;
     
-    const icon = type === 'success' ? '✓' : type === 'error' ? '✕' : type === 'warning' ? '⚠' : 'ℹ';
+    // Ícones FontAwesome para combinar com seu novo HTML
+    const icons = {
+      success: 'fa-check-circle',
+      error: 'fa-times-circle',
+      warning: 'fa-exclamation-triangle',
+      info: 'fa-info-circle'
+    };
     
     toast.innerHTML = `
-      <span style="font-size: 20px;">${icon}</span>
+      <i class="fas ${icons[type] || icons.info}" style="font-size: 18px;"></i>
       <span>${message}</span>
     `;
 
@@ -30,7 +36,7 @@ const Utils = {
       toast.style.animation = 'toastSlideIn 0.3s ease-out reverse';
       setTimeout(() => {
         toast.remove();
-        if (container.children.length === 0) container.remove();
+        if (container.children && container.children.length === 0) container.remove();
       }, 300);
     }, duration);
   },
@@ -41,6 +47,7 @@ const Utils = {
   showModal(modalId) {
     const modal = document.getElementById(modalId);
     if (modal) {
+      modal.classList.remove('hidden'); // Compatível com seu HTML novo
       modal.style.display = 'flex'; 
       setTimeout(() => modal.classList.add('active'), 10);
       document.body.style.overflow = 'hidden';
@@ -53,6 +60,7 @@ const Utils = {
       modal.classList.remove('active');
       setTimeout(() => {
         modal.style.display = 'none';
+        modal.classList.add('hidden');
         document.body.style.overflow = '';
       }, 300);
     }
@@ -62,32 +70,49 @@ const Utils = {
   // GOOGLE MAPS (CORRIGIDO)
   // ========================================
   openGoogleMaps(origin, destination) {
-    // Corrigido para a URL oficial de navegação do Google Maps
+    // URL universal para navegação GPS
     const url = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(origin)}&destination=${encodeURIComponent(destination)}&travelmode=motorcycle`;
     window.open(url, '_blank');
   },
 
   getAddressLink(address) {
-    // Corrigido para a URL oficial de busca de endereço
+    // URL para busca direta de endereço
     return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
   },
 
   // ========================================
-  // FORMATAÇÃO E STATUS
+  // LÓGICA BENAION (Tempo e Dinheiro)
   // ========================================
   formatCurrency(value) {
     return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
       currency: 'BRL'
-    }).format(value);
+    }).format(value || 0);
   },
 
+  // Regra dos 30 centavos após 3 minutos no mercado
+  calcularAdicionalTempo(dataInicio) {
+    if (!dataInicio) return 0;
+    const inicio = new Date(dataInicio);
+    const agora = new Date();
+    const diffMs = agora - inicio;
+    const diffMinutos = Math.floor(diffMs / 60000);
+
+    if (diffMinutos > 3) {
+      return (diffMinutos - 3) * 0.30;
+    }
+    return 0;
+  },
+
+  // ========================================
+  // STATUS E COMUNICAÇÃO
+  // ========================================
   getStatusText(status) {
     const statusMap = {
-      'recebido': 'Recebido',
-      'aguardando_entregador': 'Aguardando Entregador',
-      'aceito': 'Aceito',
-      'em_coleta': 'Buscando Pedido',
+      'pendente': 'Aguardando Loja',
+      'preparando': 'Loja Separando Itens',
+      'pronto': 'Pronto para Coleta',
+      'aceito': 'Entregador a caminho',
       'em_entrega': 'Em Rota de Entrega',
       'finalizado': 'Entregue ✅',
       'cancelado': 'Cancelado ✕'
@@ -95,10 +120,14 @@ const Utils = {
     return statusMap[status] || status;
   },
 
+  openWhatsApp(tel, mensagem) {
+    const link = `https://wa.me/55${tel.replace(/\D/g, '')}?text=${encodeURIComponent(mensagem)}`;
+    window.open(link, '_blank');
+  },
+
   vibrate(pattern = [200]) {
     if ('vibrate' in navigator) navigator.vibrate(pattern);
   }
 };
 
-// Tornar global para que o index.html consiga ler
 window.Utils = Utils;
