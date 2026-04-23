@@ -13,10 +13,22 @@
     .status-open { background: #e8f5e9; color: #2ecc71; }
     .status-closed { background: #ffebee; color: #e30613; }
     
-    .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; margin-top: 15px; }
-    .product-card { background: white; border-radius: 8px; padding: 10px; border: 1px solid #eee; text-align: center; }
-    .product-card img { width: 100%; height: 80px; object-fit: cover; border-radius: 4px; }
+    /* Grid de Produtos */
+    .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; margin-top: 15px; }
+    .product-card { background: white; border-radius: 12px; padding: 12px; border: 1px solid #eee; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+    .product-card h4 { font-size: 14px; margin: 8px 0 4px; color: var(--dark); }
+    .product-card p { font-size: 13px; font-weight: bold; color: var(--primary-red); }
     
+    /* Cards de Pedidos */
+    .pedido-card { border-left: 5px solid #ccc; transition: 0.3s; }
+    .pedido-card.preparando { border-left-color: #3498db; }
+    .pedido-card.pronto { border-left-color: #2ecc71; }
+    
+    .valor-retirada-destaque { 
+        background: #fdf2f2; border: 1px dashed var(--primary-red); 
+        padding: 10px; border-radius: 8px; margin: 10px 0; text-align: center;
+    }
+
     .tab-section { animation: fadeIn 0.3s ease; }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
   </style>
@@ -31,14 +43,14 @@
           </div>
           <div class="logo-text">
             <h1 id="lojaNome">Sua Loja</h1>
-            <p id="lojaStatus"><span class="badge-status status-open">LOJA ABERTA</span></p>
+            <p id="lojaStatus"><span class="badge-status status-open" id="statusBadge">LOJA ABERTA</span></p>
           </div>
         </div>
         <div class="header-actions">
           <button class="header-btn" onclick="toggleLojaStatus()" title="Abrir/Fechar">
             <i class="fas fa-store"></i>
           </button>
-          <button class="header-btn" onclick="Auth.logout()">
+          <button class="header-btn" onclick="window.Auth.logout()">
             <i class="fas fa-power-off"></i>
           </button>
         </div>
@@ -50,11 +62,11 @@
         <div class="stats-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px;">
           <div class="card" style="text-align: center; padding: 10px;">
             <div style="font-size: 20px; font-weight: bold; color: var(--primary-red);" id="vendasHoje">0</div>
-            <div style="font-size: 10px; color: var(--gray);">Hoje</div>
+            <div style="font-size: 10px; color: var(--gray);">Vendas</div>
           </div>
           <div class="card" style="text-align: center; padding: 10px;">
-            <div style="font-size: 20px; font-weight: bold;" id="faturamentoHoje">R$ 0</div>
-            <div style="font-size: 10px; color: var(--gray);">Ganhos</div>
+            <div style="font-size: 18px; font-weight: bold;" id="faturamentoHoje">R$ 0,00</div>
+            <div style="font-size: 10px; color: var(--gray);">Faturamento</div>
           </div>
           <div class="card" style="text-align: center; padding: 10px;">
             <div style="font-size: 20px; font-weight: bold; color: #2ecc71;" id="pedidosAtivos">0</div>
@@ -62,8 +74,8 @@
           </div>
         </div>
 
-        <button class="btn btn-primary" onclick="abrirModalPedido()" style="width: 100%; margin-bottom: 20px;">
-          <i class="fas fa-plus"></i> NOVO PEDIDO MANUAL
+        <button class="btn btn-primary" onclick="abrirModalChamarEntregador()" style="width: 100%; margin-bottom: 20px; background-color: #27ae60; border: none;">
+          <i class="fas fa-motorcycle"></i> CHAMAR ENTREGADOR BENAION
         </button>
 
         <div id="listaPedidos">
@@ -71,32 +83,39 @@
       </section>
 
       <section id="aba-produtos" class="tab-section hidden">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-          <h3>Meu Cardápio</h3>
-          <button class="btn btn-small btn-primary" onclick="Utils.showModal('modalProduto')">+ Novo</button>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+          <h3>Meu Catálogo</h3>
+          <button class="btn btn-small btn-primary" onclick="Utils.showModal('modalProduto')">
+            <i class="fas fa-plus"></i> Novo Item
+          </button>
         </div>
         <div class="product-grid" id="gridProdutos">
-          </div>
+           </div>
       </section>
 
       <section id="aba-perfil" class="tab-section hidden">
         <div class="card">
-          <h3>Dados do Empreendimento</h3>
+          <h3>Configurações da Loja</h3>
           <form id="formPerfilLoja" onsubmit="salvarPerfil(event)" style="margin-top: 15px;">
             <div class="form-group">
-              <label>Nome Fantasia</label>
-              <input type="text" class="form-control" id="nomeFantasia" placeholder="Nome da sua loja">
+              <label>Nome da Loja (Como aparece no App)</label>
+              <input type="text" class="form-control" id="nomeFantasia" placeholder="Ex: Mercantil Ramalho">
             </div>
             <div class="form-group">
-              <label>Categoria</label>
+              <label>Categoria de Venda</label>
               <select class="form-control" id="categoriaLoja">
+                <option value="mercado">Mercado / Mercearia</option>
                 <option value="restaurante">Restaurante / Lanchonete</option>
                 <option value="farmacia">Farmácia</option>
-                <option value="mercado">Mercado</option>
-                <option value="outros">Outros</option>
+                <option value="bebidas">Distribuidora de Bebidas</option>
               </select>
             </div>
-            <button type="submit" class="btn btn-primary" style="width: 100%;">Salvar Dados</button>
+            <div class="form-group">
+                <label>Comissão da Benaion (%)</label>
+                <input type="text" class="form-control" id="comissaoLoja" readonly value="10%">
+                <small>Taxa fixa para parceiros cadastrados.</small>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: 100%;">Atualizar Informações</button>
           </form>
         </div>
       </section>
@@ -107,18 +126,42 @@
         <i class="fas fa-receipt"></i><span>Pedidos</span>
       </button>
       <button class="nav-item" id="nav-produtos" onclick="switchTab('produtos')">
-        <i class="fas fa-hamburger"></i><span>Produtos</span>
+        <i class="fas fa-store-alt"></i><span>Catálogo</span>
       </button>
       <button class="nav-item" id="nav-perfil" onclick="switchTab('perfil')">
-        <i class="fas fa-cog"></i><span>Gestão</span>
+        <i class="fas fa-user-tie"></i><span>Gestão</span>
       </button>
     </nav>
   </div>
 
-  <div class="modal" id="modalProduto">
+  <div class="modal hidden" id="modalProduto">
     <div class="modal-content">
       <div class="modal-header">
-        <h3>Cadastrar Produto</h3>
+        <h3>Novo Produto no App</h3>
         <button class="modal-close" onclick="Utils.hideModal('modalProduto')">&times;</button>
       </div>
       <div class="modal-body">
+        <form id="formAddProduto">
+          <div class="form-group">
+            <label>Nome do Item</label>
+            <input type="text" id="pNome" class="form-control" placeholder="Ex: Arroz Tio João 5kg" required>
+          </div>
+          <div class="form-group">
+            <label>Preço para o Cliente (R$)</label>
+            <input type="number" id="pPreco" class="form-control" step="0.01" placeholder="0.00" required>
+          </div>
+          <div class="form-group">
+            <label>Descrição / Peso</label>
+            <input type="text" id="pDesc" class="form-control" placeholder="Ex: Unidade 5kg">
+          </div>
+          <button type="submit" class="btn btn-primary" style="width: 100%;">Adicionar ao App</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/api.js" type="module"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/parceiro.js" type="module"></script>
+</body>
+</html>
