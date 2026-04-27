@@ -190,12 +190,19 @@
       </div>
     </div>
   </div>
-
+  
   <script src="js/utils.js"></script>
-  <script src="js/auth.js"></script> <script src="js/api.js"></script>
+  
+  <script type="module" src="js/api.js"></script>
 
   <script>
+    // Referência ao loading que você criou
     const loading = document.getElementById('loadingOverlay');
+
+    // Função auxiliar para esperar o motor carregar
+    function sistemaPronto() {
+        return window.Auth && window.API && window.auth;
+    }
 
     function toggleParceiroFields() {
       const type = document.getElementById('registerUserType').value;
@@ -212,56 +219,77 @@
     }
 
     function handleOpenRegister() {
-      Utils.showModal('registerModal');
+      window.Utils.showModal('registerModal');
     }
 
     function handleCloseRegister() {
-      Utils.hideModal('registerModal');
+      window.Utils.hideModal('registerModal');
     }
 
+    // --- LOGIN POR EMAIL ---
     async function handleEmailLogin(event) {
       event.preventDefault();
+      if (!sistemaPronto()) return;
+
       loading.style.display = 'flex';
       
       try {
         const email = document.getElementById('email').value;
         const pass = document.getElementById('password').value;
-        await Auth.loginWithEmail(email, pass);
+        // Chama o Auth global que definimos no api.js
+        await window.Auth.loginWithEmail(email, pass);
       } catch (error) {
         loading.style.display = 'none';
-        Utils.showToast(error.message, 'error');
+        window.Utils.showToast("Email ou senha incorretos", 'error');
       }
     }
 
+    // --- CADASTRO DE NOVOS USUÁRIOS ---
     async function handleRegister(event) {
       event.preventDefault();
+      if (!sistemaPronto()) return;
+
       loading.style.display = 'flex';
 
       const userType = document.getElementById('registerUserType').value;
+      const email = document.getElementById('registerEmail').value;
+      const password = document.getElementById('registerPassword').value;
+      
       const dados = {
         name: document.getElementById('registerName').value,
-        email: document.getElementById('registerEmail').value,
+        email: email,
         userType: userType,
-        password: document.getElementById('registerPassword').value,
         storeName: (userType === 'parceiro') ? document.getElementById('storeName').value : null
       };
 
       try {
-        await Auth.register(dados);
-        Utils.showToast("Bem-vindo à família Benaion!", "success");
+        // Usa a lógica de registro direto do Firebase Auth
+        const userCredential = await window.authService.createUserWithEmailAndPassword(window.auth, email, password);
+        await window.API.saveUserToFirestore(userCredential.user.uid, dados);
+        
+        window.Utils.showToast("Bem-vindo à família Benaion!", "success");
+        // Redireciona após cadastro
+        localStorage.setItem('benaion_user', JSON.stringify({ id: userCredential.user.uid, ...dados }));
+        window.location.href = `${userType}.html`;
       } catch (error) {
         loading.style.display = 'none';
-        Utils.showToast(error.message, "error");
+        window.Utils.showToast("Erro ao cadastrar: " + error.message, "error");
       }
     }
 
+    // --- LOGIN COM GOOGLE ---
     async function handleGoogleLogin() {
+      if (!sistemaPronto()) {
+          window.Utils.showToast("Conectando ao servidor...", "info");
+          return;
+      }
+      
       loading.style.display = 'flex';
       try {
-        await Auth.loginWithGoogle();
+        await window.Auth.loginWithGoogle();
       } catch (error) {
         loading.style.display = 'none';
-        Utils.showToast(error.message, 'error');
+        window.Utils.showToast("Falha na conexão com o Google", 'error');
       }
     }
   </script>
