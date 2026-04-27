@@ -26,17 +26,19 @@ let TAXAS_LOCAIS = {
   "José cesário": 6, "Malvinas": 8, "samaúma": 15, "monte dourado": 30
 };
 
+// Sincroniza taxas com o Admin Panel em tempo real
 function sincronizarTaxas() {
   onSnapshot(doc(db, "configuracoes", "taxas"), (doc) => {
     if (doc.exists()) {
       TAXAS_LOCAIS = doc.data();
-      console.log("✅ Taxas atualizadas");
+      console.log("✅ Taxas atualizadas do Banco de Dados");
     }
   });
 }
 sincronizarTaxas();
 
 const API = {
+  // Lógica de cálculo flexível conforme solicitado
   calcularTaxa(bairroRetirada, bairroEntrega, adicionais = 0) {
     const taxaRet = TAXAS_LOCAIS[bairroRetirada] || 6;
     const taxaEnt = TAXAS_LOCAIS[bairroEntrega] || 6;
@@ -49,8 +51,18 @@ const API = {
   async saveUserToFirestore(uid, userData) {
     await setDoc(doc(db, "users", uid), { ...userData, updated_at: new Date().toISOString() }, { merge: true });
   },
-  async atualizarTabelaTaxas(novaTabela) {
-    await setDoc(doc(db, "configuracoes", "taxas"), novaTabela);
+  async updateUser(uid, data) {
+    await updateDoc(doc(db, "users", uid), data);
+  },
+  async createPedido(pedidoData) {
+    return await addDoc(collection(db, "pedidos"), {
+      ...pedidoData,
+      status: pedidoData.status || 'aguardando_entregador',
+      created_at: new Date().toISOString()
+    });
+  },
+  async updatePedido(pedidoId, data) {
+    await updateDoc(doc(db, "pedidos", pedidoId), data);
   },
   escutarTodosPedidos(callback) {
     return onSnapshot(collection(db, "pedidos"), (snapshot) => {
@@ -85,15 +97,21 @@ const Auth = {
   requireAuth(allowedTypes = []) {
     const user = this.getCurrentUser();
     if (!user) { window.location.href = 'index.html'; return false; }
+    if (allowedTypes.length > 0 && !allowedTypes.includes(user.userType)) {
+        window.location.href = 'index.html';
+        return false;
+    }
     return true;
   }
 };
 
-// --- EXPOSIÇÃO GLOBAL (CORRIGE O ERRO "auth is not defined") ---
+// --- EXPOSIÇÃO GLOBAL (ESSENCIAL PARA FUNCIONAR NO GITHUB PAGES) ---
 window.auth = auth;
 window.db = db;
 window.API = API;
 window.Auth = Auth;
 window.TAXAS_LOCAIS = TAXAS_LOCAIS;
+// Objeto que faltava para corrigir o erro de cadastro do seu print
+window.authService = { createUserWithEmailAndPassword, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup };
 
-console.log("🚀 Benaion API v2.0 Ativa");
+console.log("🚀 Benaion API v2.0 - Laranjal do Jari & Monte Dourado Ativa");
