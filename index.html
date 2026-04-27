@@ -13,7 +13,6 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
 
   <style>
-    /* Estilos de Alta Performance */
     body {
       background: linear-gradient(180deg, var(--primary-red) 0%, #a0040d 100%);
       min-height: 100vh;
@@ -21,14 +20,9 @@
       align-items: center;
       justify-content: center;
       overflow-x: hidden;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
-
-    .login-container {
-      width: 100%;
-      max-width: 400px;
-      padding: 20px;
-    }
-
+    .login-container { width: 100%; max-width: 400px; padding: 20px; }
     .login-card {
       background: rgba(255, 255, 255, 0.98);
       backdrop-filter: blur(10px);
@@ -36,57 +30,24 @@
       padding: 32px;
       box-shadow: 0 20px 40px rgba(0,0,0,0.3);
     }
-
     .btn-google {
-      background: white;
-      border: 1px solid #ddd;
-      color: #555;
-      font-weight: 600;
-      transition: all 0.3s ease;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
+      background: white; border: 1px solid #ddd; color: #555;
+      font-weight: 600; display: flex; align-items: center;
+      justify-content: center; gap: 12px; padding: 12px; border-radius: 12px;
     }
-
-    .btn-google:active { transform: scale(0.98); background: #f8f8f8; }
-
     .input-animated {
-      border: 2px solid #eee;
-      border-radius: 12px;
-      padding: 12px 16px;
-      transition: all 0.3s ease;
+      border: 2px solid #eee; border-radius: 12px;
+      padding: 12px 16px; transition: all 0.3s ease; width: 100%; margin-bottom: 15px;
     }
-
-    .input-animated:focus {
-      border-color: var(--primary-red);
-      box-shadow: 0 0 0 4px rgba(227, 6, 19, 0.1);
-    }
-
-    .register-type-card {
-      border: 2px solid #eee;
-      border-radius: 12px;
-      padding: 10px;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .register-type-card.active {
-      border-color: var(--primary-red);
-      background: rgba(227, 6, 19, 0.05);
-    }
-
+    .input-animated:focus { border-color: var(--primary-red); outline: none; }
     .loading-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(227, 6, 19, 0.95);
-      z-index: 9999;
-      display: none;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      color: white;
+      position: fixed; inset: 0; background: rgba(227, 6, 19, 0.95);
+      z-index: 9999; display: none; flex-direction: column;
+      align-items: center; justify-content: center; color: white;
     }
+    .divider { text-align: center; margin: 20px 0; color: #aaa; font-size: 12px; position: relative; }
+    .divider::before, .divider::after { content: ""; position: absolute; top: 50%; width: 30%; height: 1px; background: #eee; }
+    .divider::before { left: 0; } .divider::after { right: 0; }
   </style>
 </head>
 <body>
@@ -99,200 +60,129 @@
   </div>
 
   <div class="login-container animate__animated animate__fadeInUp">
-    
     <div class="login-logo" style="text-align: center; margin-bottom: 25px;">
-      <img src="https://i.postimg.cc/T2Vt53JP/Vermelho-delivery-logo-20260227-011329-0005.png" 
-           alt="Benaion Delivery" 
-           style="width: 130px; height: 130px; border-radius: 50%; border: 4px solid white; box-shadow: 0 10px 20px rgba(0,0,0,0.2);">
+      <img src="https://i.postimg.cc/T2Vt53JP/Vermelho-delivery-logo-20260227-011329-0005.png" alt="Benaion" style="width: 120px; height: 120px; border-radius: 50%; border: 4px solid white;">
     </div>
 
     <div class="login-card">
-      <h2 style="text-align: center; font-weight: 800; margin-bottom: 8px; color: var(--dark);">Bem-vindo</h2>
+      <h2 style="text-align: center; font-weight: 800; margin-bottom: 8px;">Bem-vindo</h2>
       <p style="text-align: center; color: #777; font-size: 14px; margin-bottom: 24px;">Entre para continuar</p>
 
-      <button onclick="handleGoogleLogin()" class="btn btn-google w-100 mb-3">
+      <button onclick="handleGoogleLogin()" class="btn-google w-100 mb-3" style="width: 100%; cursor: pointer;">
         <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="18">
         Continuar com Google
       </button>
 
       <div class="divider">ou use seu email</div>
 
-      <form id="loginForm" onsubmit="handleEmailLogin(event)">
-        <div class="form-group">
-          <input type="email" class="form-control input-animated" id="email" placeholder="Email" required>
-        </div>
-
-        <div class="form-group">
-          <input type="password" class="form-control input-animated" id="password" placeholder="Senha" required>
-        </div>
-
-        <button type="submit" class="btn btn-primary w-100" id="btnLogin" style="padding: 14px; font-weight: 700;">
+      <form onsubmit="handleEmailLogin(event)">
+        <input type="email" class="input-animated" id="email" placeholder="Seu email" required>
+        <input type="password" class="input-animated" id="password" placeholder="Sua senha" required>
+        <button type="submit" class="btn btn-primary w-100" style="width: 100%; padding: 14px; font-weight: 700; background: var(--primary-red); color: white; border: none; border-radius: 12px; cursor: pointer;">
           ENTRAR
         </button>
       </form>
 
       <div style="text-align: center; margin-top: 20px;">
         <span style="color: #777; font-size: 14px;">Não tem conta?</span>
-        <a href="#" onclick="handleOpenRegister()" style="color: var(--primary-red); font-weight: 700; text-decoration: none; margin-left: 5px;">Criar Agora</a>
+        <a href="#" onclick="handleOpenRegister()" style="color: var(--primary-red); font-weight: 700; text-decoration: none;"> Criar Agora</a>
       </div>
     </div>
 
-    <div style="text-align: center; margin-top: 30px; color: rgba(255,255,255,0.8);">
-      <p style="font-size: 12px; letter-spacing: 1px; font-weight: 600;">LARANJAL DO JARI • MONTE DOURADO</p>
-      <p style="font-size: 11px; margin-top: 5px; opacity: 0.6;">BENAION DELIVERY 2026 • v1.5.0</p>
+    <div style="text-align: center; margin-top: 30px; color: white;">
+      <p style="font-size: 12px; font-weight: 600;">LARANJAL DO JARI • MONTE DOURADO</p>
+      <p style="font-size: 11px; opacity: 0.6;">BENAION DELIVERY 2026 • v1.5.0</p>
+    </div>
+  </div>
+
+  <div class="modal" id="registerModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center;">
+    <div class="login-card animate__animated animate__zoomIn" style="width: 90%; max-width: 400px; position: relative;">
+      <button onclick="handleCloseRegister()" style="position: absolute; right: 15px; top: 15px; border: none; background: none; font-size: 20px;">&times;</button>
+      <h3 style="margin-bottom: 20px; text-align: center;">Começar na Benaion</h3>
+      
+      <form onsubmit="handleRegister(event)">
+        <select class="input-animated" id="registerUserType" required onchange="toggleParceiroFields()">
+          <option value="cliente">😋 Cliente (Pedir)</option>
+          <option value="entregador">🛵 Entregador (Trabalhar)</option>
+          <option value="parceiro">🏢 Parceiro (Loja)</option>
+        </select>
+        
+        <input type="text" class="input-animated" id="registerName" placeholder="Nome Completo" required>
+        
+        <div id="parceiroExtraFields" class="hidden" style="display: none;">
+            <input type="text" class="input-animated" id="storeName" placeholder="Nome da Loja">
+        </div>
+
+        <input type="email" class="input-animated" id="registerEmail" placeholder="Email" required>
+        <input type="password" class="input-animated" id="registerPassword" placeholder="Senha (mín. 6 dígitos)" required minlength="6">
+        
+        <button type="submit" class="btn btn-primary w-100" style="width: 100%; padding: 14px; background: var(--primary-red); color: white; border: none; border-radius: 12px;">
+          CONCLUIR CADASTRO
+        </button>
+      </form>
     </div>
   </div>
 
-  <div class="modal" id="registerModal">
-    <div class="modal-content animate__animated animate__zoomIn">
-      <div class="modal-header">
-        <h3 class="modal-title">Começar na Benaion</h3>
-        <button class="modal-close" onclick="handleCloseRegister()">&times;</button>
-      </div>
-      <div class="modal-body">
-        <form id="registerForm" onsubmit="handleRegister(event)">
-          
-          <div class="form-group">
-            <label class="form-label">Eu quero ser:</label>
-            <select class="form-control" id="registerUserType" onchange="toggleParceiroFields()" required>
-              <option value="cliente">😋 Cliente (Pedir comida/produtos)</option>
-              <option value="entregador">🛵 Entregador (Fazer entregas)</option>
-              <option value="parceiro">🏢 Parceiro (Vender produtos)</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label class="form-label" id="labelNome">Nome Completo</label>
-            <input type="text" class="form-control" id="registerName" placeholder="Como quer ser chamado?" required>
-          </div>
-
-          <div id="parceiroExtraFields" class="hidden">
-             <div class="form-group">
-                <label class="form-label">Nome do Empreendimento/Loja</label>
-                <input type="text" class="form-control" id="storeName" placeholder="Ex: Burguer do Jari">
-             </div>
-          </div>
-
-          <div class="form-group">
-            <label class="form-label">Seu melhor Email</label>
-            <input type="email" class="form-control" id="registerEmail" placeholder="exemplo@gmail.com" required>
-          </div>
-
-          <div class="form-group">
-            <label class="form-label">Criar Senha</label>
-            <input type="password" class="form-control" id="registerPassword" placeholder="Mínimo 6 caracteres" required minlength="6">
-          </div>
-
-          <button type="submit" class="btn btn-primary w-100" id="btnRegSubmit">
-            CONCLUIR CADASTRO
-          </button>
-        </form>
-      </div>
-    </div>
-  </div>
-  
   <script src="js/utils.js"></script>
-  
   <script type="module" src="js/api.js"></script>
 
   <script>
-    // Referência ao loading que você criou
     const loading = document.getElementById('loadingOverlay');
-
-    // Função auxiliar para esperar o motor carregar
-    function sistemaPronto() {
-        return window.Auth && window.API && window.auth;
-    }
 
     function toggleParceiroFields() {
       const type = document.getElementById('registerUserType').value;
-      const extra = document.getElementById('parceiroExtraFields');
-      const labelNome = document.getElementById('labelNome');
-      
-      if (type === 'parceiro') {
-        extra.classList.remove('hidden');
-        labelNome.innerText = "Nome do Responsável";
-      } else {
-        extra.classList.add('hidden');
-        labelNome.innerText = "Nome Completo";
-      }
+      document.getElementById('parceiroExtraFields').style.display = (type === 'parceiro') ? 'block' : 'none';
     }
 
-    function handleOpenRegister() {
-      window.Utils.showModal('registerModal');
-    }
+    function handleOpenRegister() { document.getElementById('registerModal').style.display = 'flex'; }
+    function handleCloseRegister() { document.getElementById('registerModal').style.display = 'none'; }
 
-    function handleCloseRegister() {
-      window.Utils.hideModal('registerModal');
-    }
-
-    // --- LOGIN POR EMAIL ---
     async function handleEmailLogin(event) {
       event.preventDefault();
-      if (!sistemaPronto()) return;
-
+      if (!window.Auth) return;
       loading.style.display = 'flex';
-      
       try {
-        const email = document.getElementById('email').value;
-        const pass = document.getElementById('password').value;
-        // Chama o Auth global que definimos no api.js
-        await window.Auth.loginWithEmail(email, pass);
-      } catch (error) {
+        await window.Auth.loginWithEmail(document.getElementById('email').value, document.getElementById('password').value);
+      } catch (e) {
         loading.style.display = 'none';
-        window.Utils.showToast("Email ou senha incorretos", 'error');
+        window.Utils.showToast("Email ou senha inválidos", "error");
       }
     }
 
-    // --- CADASTRO DE NOVOS USUÁRIOS ---
     async function handleRegister(event) {
       event.preventDefault();
-      if (!sistemaPronto()) return;
-
+      if (!window.authService) {
+        window.Utils.showToast("Carregando sistema...", "info");
+        return;
+      }
       loading.style.display = 'flex';
 
-      const userType = document.getElementById('registerUserType').value;
       const email = document.getElementById('registerEmail').value;
-      const password = document.getElementById('registerPassword').value;
-      
-      const dados = {
-        name: document.getElementById('registerName').value,
-        email: email,
-        userType: userType,
-        storeName: (userType === 'parceiro') ? document.getElementById('storeName').value : null
-      };
+      const pass = document.getElementById('registerPassword').value;
+      const userType = document.getElementById('registerUserType').value;
 
       try {
-        // Usa a lógica de registro direto do Firebase Auth
-        const userCredential = await window.authService.createUserWithEmailAndPassword(window.auth, email, password);
+        const userCredential = await window.authService.createUserWithEmailAndPassword(window.auth, email, pass);
+        const dados = {
+          name: document.getElementById('registerName').value,
+          email: email,
+          userType: userType,
+          storeName: document.getElementById('storeName').value || null
+        };
         await window.API.saveUserToFirestore(userCredential.user.uid, dados);
-        
-        window.Utils.showToast("Bem-vindo à família Benaion!", "success");
-        // Redireciona após cadastro
-        localStorage.setItem('benaion_user', JSON.stringify({ id: userCredential.user.uid, ...dados }));
         window.location.href = `${userType}.html`;
-      } catch (error) {
+      } catch (e) {
         loading.style.display = 'none';
-        window.Utils.showToast("Erro ao cadastrar: " + error.message, "error");
+        window.Utils.showToast("Erro ao cadastrar. Tente outro email.", "error");
       }
     }
 
-    // --- LOGIN COM GOOGLE ---
     async function handleGoogleLogin() {
-      if (!sistemaPronto()) {
-          window.Utils.showToast("Conectando ao servidor...", "info");
-          return;
-      }
-      
+      if (!window.Auth) return;
       loading.style.display = 'flex';
-      try {
-        await window.Auth.loginWithGoogle();
-      } catch (error) {
-        loading.style.display = 'none';
-        window.Utils.showToast("Falha na conexão com o Google", 'error');
-      }
+      try { await window.Auth.loginWithGoogle(); }
+      catch (e) { loading.style.display = 'none'; }
     }
   </script>
 </body>
 </html>
-
