@@ -8,7 +8,6 @@
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
-  <link rel="manifest" href="manifest.json">
 </head>
 <body>
   <div class="container">
@@ -19,7 +18,7 @@
             <img src="https://i.postimg.cc/T2Vt53JP/Vermelho-delivery-logo-20260227-011329-0005.png" alt="Logo Benaion" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
           </div>
           <div class="logo-text">
-            <h1 id="clienteNome">Carregando...</h1>
+            <h1 id="clienteNome">Buscando...</h1>
             <p>Painel do Cliente</p>
           </div>
         </div>
@@ -30,103 +29,91 @@
     </header>
 
     <main class="page">
-      <div class="card animate__animated animate__fadeIn" style="background: linear-gradient(135deg, var(--primary-red), #c00510); color: white; text-align: center; padding: 20px; border-radius: 15px; border: none; box-shadow: 0 10px 20px rgba(0,0,0,0.1);">
-        <h2 style="margin-bottom: 8px; font-weight: 800;">🚀 Benaion Delivery</h2>
-        <p style="opacity: 0.9; font-size: 14px;">Logística rápida em Laranjal do Jari</p>
+      <div class="card animate__animated animate__fadeIn" style="background: linear-gradient(135deg, #E30613, #9e040d); color: white; text-align: center; padding: 20px; border-radius: 15px; border: none;">
+        <h2 style="margin-bottom: 5px; font-weight: 800;">🚀 Benaion Delivery</h2>
+        <p style="opacity: 0.9; font-size: 13px;">Seu pedido em boas mãos em Laranjal do Jari</p>
       </div>
 
-      <button class="btn btn-primary mb-2 animate__animated animate__pulse animate__infinite" 
+      <button class="btn btn-primary animate__animated animate__pulse animate__infinite" 
               onclick="window.Utils.showModal('novoPedidoModal')" 
-              style="font-size: 18px; padding: 18px; box-shadow: 0 4px 15px rgba(227, 6, 19, 0.3); width: 100%; margin-top: 20px; border-radius: 12px; font-weight: 800;">
+              style="font-size: 17px; padding: 18px; width: 100%; margin: 20px 0; border-radius: 15px; font-weight: 800; border: none; box-shadow: 0 8px 15px rgba(227, 6, 19, 0.2);">
         <i class="fas fa-motorcycle"></i> SOLICITAR NOVA ENTREGA
       </button>
 
-      <div class="card" style="background: #fff; border: 1px solid #eee; margin-top: 20px; border-radius: 12px; padding: 15px;">
-        <h3 style="margin-bottom: 12px; color: var(--dark); font-size: 16px; font-weight: 700;">🏪 Lojas Parceiras</h3>
-        <div id="listaParceiros" style="display: flex; gap: 12px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: none;">
-          <div style="text-align: center; min-width: 80px;">
-             <div style="width: 60px; height: 60px; background: #f5f5f5; border-radius: 50%; margin: 0 auto; border: 2px solid #E30613;"></div>
-             <p style="font-size: 11px; margin-top: 5px; font-weight: 600;">Carregando...</p>
+      <div class="card" style="background: #fff; margin-bottom: 25px; border-radius: 15px; padding: 15px; border: 1px solid #f0f0f0;">
+        <h3 style="margin-bottom: 12px; font-size: 15px; font-weight: 800; color: #333;">🏪 Lojas Parceiras</h3>
+        <div id="listaParceiros" style="display: flex; gap: 15px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: none;">
           </div>
-        </div>
       </div>
 
-      <h3 style="margin: 24px 0 12px; color: var(--dark); display: flex; justify-content: space-between; align-items: center; font-weight: 800;">
-        📦 Meus Pedidos 
-        <small id="contadorPedidos" style="font-size: 12px; background: #E30613; color: white; padding: 2px 10px; border-radius: 10px;">0</small>
-      </h3>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+          <h3 style="font-weight: 800; color: #333; font-size: 18px;">📦 Meus Pedidos</h3>
+          <span id="contadorPedidos" style="background: #E30613; color: white; padding: 2px 12px; border-radius: 20px; font-size: 12px; font-weight: bold;">0</span>
+      </div>
       
       <div id="listaPedidos">
-         <div class="text-center" style="padding: 30px; opacity: 0.5;">
-            <i class="fas fa-box-open fa-3x"></i>
-            <p style="margin-top: 10px;">Buscando seus pedidos...</p>
+         <div style="text-align: center; padding: 40px; opacity: 0.4;">
+            <i class="fas fa-circle-notch fa-spin fa-2x"></i>
+            <p style="margin-top: 10px;">Sincronizando com o radar...</p>
          </div>
-      </div>
-
-      <div class="card" style="background: #1a1a1a; color: #fff; margin-top: 24px; border: none; border-radius: 12px;">
-        <h4 style="color: var(--primary-yellow); margin-bottom: 12px;"><i class="fas fa-shield-alt"></i> Segurança BENAION</h4>
-        <p style="font-size: 12px; opacity: 0.8; line-height: 1.5;">
-          🚫 Não transportamos Bebidas, Cigarros, Drogas ou Pessoas.<br>
-          ✅ Pagamento via PIX ou Dinheiro direto ao entregador.
-        </p>
       </div>
     </main>
 
     <nav class="bottom-nav">
       <button class="nav-item active"><i class="fas fa-home"></i><span>Início</span></button>
       <button class="nav-item" onclick="window.Utils.showModal('novoPedidoModal')"><i class="fas fa-plus-circle"></i><span>Pedir</span></button>
-      <button class="nav-item" onclick="window.Utils.showToast('Em breve!', 'info')"><i class="fas fa-user"></i><span>Perfil</span></button>
+      <button class="nav-item" onclick="window.Utils.showToast('Perfil em breve!', 'info')"><i class="fas fa-user"></i><span>Perfil</span></button>
     </nav>
   </div>
 
   <div class="modal" id="novoPedidoModal">
     <div class="modal-content animate__animated animate__slideInUp">
       <div class="modal-header">
-        <h3 class="modal-title">📝 Solicitar Entrega</h3>
+        <h3 class="modal-title">📝 Nova Entrega</h3>
         <button class="modal-close" onclick="window.Utils.hideModal('novoPedidoModal')">&times;</button>
       </div>
       <div class="modal-body">
         <form id="novoPedidoForm" onsubmit="handleNovoPedido(event)">
           
-          <label class="form-label">Onde vamos buscar? (Retirada)</label>
-          <div class="form-group-flex" style="display: grid; grid-template-columns: 1fr 1.2fr; gap: 8px;">
+          <label class="form-label">Onde buscar? (Bairro e Local)</label>
+          <div style="display: grid; grid-template-columns: 1fr 1.2fr; gap: 8px; margin-bottom: 15px;">
             <select class="form-control" id="pedidoBairroRetirada" required onchange="atualizarTaxaEstimada()">
-              <option value="centro">Centro (Sede)</option>
+              <option value="centro">Centro</option>
               <option value="Agreste">Agreste</option>
               <option value="Cajari">Cajari</option>
               <option value="Malvinas">Malvinas</option>
-              <option value="monte dourado">Monte Dourado</option>
+              <option value="buritizal">Buritizal</option>
             </select>
-            <input type="text" class="form-control" id="pedidoRetiradaLocal" required placeholder="Ex: Farmácia Alvorada">
+            <input type="text" class="form-control" id="pedidoRetiradaLocal" required placeholder="Ex: Pizzaria X">
           </div>
 
-          <label class="form-label" style="margin-top:15px;">Para onde vamos levar? (Destino)</label>
-          <div class="form-group-flex" style="display: grid; grid-template-columns: 1fr 1.2fr; gap: 8px;">
+          <label class="form-label">Para onde levar?</label>
+          <div style="display: grid; grid-template-columns: 1fr 1.2fr; gap: 8px; margin-bottom: 15px;">
              <select class="form-control" id="pedidoBairroEntrega" required onchange="atualizarTaxaEstimada()">
                <option value="">Selecione o Bairro</option>
                <option value="centro">Centro</option>
                <option value="Agreste">Agreste</option>
+               <option value="Nova esperança">Nova Esperança</option>
                <option value="Cajari">Cajari</option>
                <option value="Sarney">Sarney</option>
                <option value="buritizal">Buritizal</option>
                <option value="monte dourado">Monte Dourado</option>
              </select>
-             <input type="text" class="form-control" id="pedidoEntregaLocal" required placeholder="Ex: Casa n° 123">
+             <input type="text" class="form-control" id="pedidoEntregaLocal" required placeholder="Ex: Casa 123">
           </div>
 
-          <label class="form-label" style="margin-top:15px;">O que o motoboy vai levar?</label>
-          <input type="text" class="form-control" id="pedidoProduto" required placeholder="Ex: 2 Marmitex, Documentos...">
+          <label class="form-label">O que vamos entregar?</label>
+          <input type="text" class="form-control" id="pedidoProduto" required placeholder="Ex: 2 Hambúrgueres e 1 Refri">
 
-          <div id="boxTaxa" style="margin-top: 20px; background: #f8f9fa; padding: 15px; border-radius: 10px; border-left: 5px solid #E30613;">
+          <div id="boxTaxa" style="margin-top: 20px; background: #fff5f5; padding: 15px; border-radius: 12px; border: 1px solid #ffebeb;">
              <div style="display: flex; justify-content: space-between; align-items: center;">
-                <span style="font-weight: 700; color: #555;">Taxa de Entrega:</span>
-                <span id="txtTaxaEstimada" style="font-size: 20px; font-weight: 800; color: #E30613;">R$ 0,00</span>
+                <span style="font-weight: 700; color: #666;">Taxa de Entrega:</span>
+                <span id="txtTaxaEstimada" style="font-size: 22px; font-weight: 900; color: #E30613;">R$ 6,00</span>
              </div>
-             <p style="font-size: 10px; color: #999; margin-top: 5px;">*Valor calculado com base nos bairros de Jari/Monte Dourado.</p>
           </div>
 
-          <button type="submit" class="btn btn-primary w-100" style="margin-top: 20px; padding: 15px; font-weight: 800;">
-            ENVIAR PEDIDO AGORA
+          <button type="submit" class="btn btn-primary w-100" style="margin-top: 20px; padding: 15px; font-weight: 800; border: none; border-radius: 12px;">
+            CONFIRMAR E PEDIR
           </button>
         </form>
       </div>
@@ -146,21 +133,18 @@
         return;
       }
 
-      // Proteção de Rota
       if (!window.Auth.requireAuth(['cliente'])) return;
       currentUser = window.Auth.getCurrentUser();
 
-      // UI Personalizada
       document.getElementById('clienteNome').textContent = "Olá, " + currentUser.name.split(' ')[0];
 
-      // 1. Escuta os pedidos do cliente em tempo real
+      // Escuta pedidos em tempo real via Firebase
       window.API.escutarTodosPedidos((todos) => {
           const meusPedidos = todos.filter(p => p.clienteId === currentUser.id);
           document.getElementById('contadorPedidos').textContent = meusPedidos.length;
           renderizarMeusPedidos(meusPedidos);
       });
 
-      // 2. Carregar Parceiros (Simulado ou do Firestore)
       carregarParceiros();
     }
 
@@ -169,8 +153,7 @@
     function atualizarTaxaEstimada() {
         const ret = document.getElementById('pedidoBairroRetirada').value;
         const ent = document.getElementById('pedidoBairroEntrega').value;
-        
-        if (ret && ent) {
+        if (ret && ent && window.API.calcularTaxa) {
             taxaCalculada = window.API.calcularTaxa(ret, ent);
             document.getElementById('txtTaxaEstimada').textContent = window.Utils.formatCurrency(taxaCalculada);
         }
@@ -179,43 +162,46 @@
     function renderizarMeusPedidos(pedidos) {
       const container = document.getElementById('listaPedidos');
       if (pedidos.length === 0) {
-        container.innerHTML = '<p class="text-center py-4">Você ainda não tem pedidos ativos.</p>';
+        container.innerHTML = `
+            <div style="text-align: center; padding: 30px; background: white; border-radius: 15px; color: #999;">
+                <p>Nenhum pedido no momento.</p>
+            </div>`;
         return;
       }
 
-      // Ordena por data (mais recentes primeiro)
-      pedidos.sort((a, b) => (b.created_at || 0) - (a.created_at || 0));
+      pedidos.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
       container.innerHTML = pedidos.map(p => `
-        <div class="card animate__animated animate__fadeInUp" style="margin-bottom: 12px; border-left: 5px solid ${getStatusColor(p.status)};">
-          <div style="display:flex; justify-content:space-between; align-items:center;">
-             <b style="font-size: 14px; color: #333;">#${p.id.substring(0,6).toUpperCase()}</b>
-             <span class="badge" style="background:${getStatusColor(p.status)}; color:white; font-size:10px; padding:3px 8px; border-radius:15px; font-weight:bold;">
+        <div class="card animate__animated animate__fadeInUp" style="margin-bottom: 15px; border-left: 6px solid ${getStatusColor(p.status)}; border-radius: 15px; position: relative;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px;">
+             <b style="color: #E30613; font-size: 14px;">#${p.id.substring(0,6).toUpperCase()}</b>
+             <span style="background:${getStatusColor(p.status)}; color:white; font-size:10px; padding:4px 10px; border-radius:20px; font-weight:bold;">
                 ${window.Utils.getStatusText(p.status).toUpperCase()}
              </span>
           </div>
-          <div style="margin: 10px 0; font-size: 13px;">
-             <p><i class="fas fa-map-marker-alt" style="color:var(--primary-red)"></i> ${p.bairro}</p>
-             <p style="margin-top:4px;"><i class="fas fa-box" style="color:var(--primary-red)"></i> ${p.produto || p.descricao}</p>
+          <div style="font-size: 13px; color: #555;">
+             <p style="margin-bottom: 5px;"><i class="fas fa-store"></i> <b>De:</b> ${p.retiradaLocal} (${p.bairroRetirada})</p>
+             <p><i class="fas fa-map-marker-alt"></i> <b>Para:</b> ${p.entregaLocal} (${p.bairro})</p>
           </div>
-          <div style="display:flex; justify-content:space-between; border-top: 1px solid #eee; padding-top: 10px;">
-             <span style="font-weight:bold; color:var(--primary-red);">${window.Utils.formatCurrency(p.taxaEntrega)}</span>
-             <small style="color: #999;">${new Date(p.created_at?.seconds * 1000 || p.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</small>
+          <div style="display:flex; justify-content:space-between; align-items: center; margin-top: 12px; padding-top: 10px; border-top: 1px solid #f9f9f9;">
+             <span style="font-weight:900; color:#27ae60; font-size: 16px;">${window.Utils.formatCurrency(p.taxaEntrega)}</span>
+             ${p.status === 'aguardando_entregador' ? 
+               `<button onclick="cancelarMeuPedido('${p.id}')" style="background:none; border:none; color:#999; font-size:11px;"><i class="fas fa-times"></i> CANCELAR</button>` 
+               : ''}
           </div>
         </div>
       `).join('');
     }
 
-    function getStatusColor(status) {
-      const cores = {
-        'pendente': '#f1c40f',
-        'aguardando_entregador': '#e67e22',
-        'aceito': '#3498db',
-        'em_entrega': '#9b59b6',
-        'finalizado': '#2ecc71',
-        'cancelado': '#e74c3c'
-      };
-      return cores[status] || '#999';
+    async function cancelarMeuPedido(id) {
+        if(confirm("Deseja cancelar este pedido?")) {
+            try {
+                await window.API.deletePedido(id);
+                window.Utils.showToast("Pedido cancelado.", "success");
+            } catch (e) {
+                window.Utils.showToast("Não foi possível cancelar.", "error");
+            }
+        }
     }
 
     async function handleNovoPedido(e) {
@@ -232,39 +218,42 @@
         entregaLocal: document.getElementById('pedidoEntregaLocal').value,
         produto: document.getElementById('pedidoProduto').value,
         taxaEntrega: taxaCalculada,
-        status: 'aguardando_entregador',
-        created_at: Date.now()
+        status: 'aguardando_entregador'
       };
 
       try {
         await window.API.createPedido(data);
-        window.Utils.showToast("Pedido solicitado! Buscando entregador...", "success");
+        window.Utils.showToast("Pedido enviado ao radar!", "success");
         window.Utils.hideModal('novoPedidoModal');
         e.target.reset();
       } catch (err) {
-        window.Utils.showToast("Erro ao processar pedido.", "error");
+        window.Utils.showToast("Erro ao processar.", "error");
       } finally {
         btn.disabled = false;
       }
     }
 
     function carregarParceiros() {
-       // Exemplo de parceiros - Você pode puxar do Firestore futuramente
        const parceiros = [
-          {nome: "Pizzaria Jari", img: "https://cdn-icons-png.flaticon.com/512/3132/3132693.png"},
+          {nome: "Pizzaria", img: "https://cdn-icons-png.flaticon.com/512/3132/3132693.png"},
           {nome: "Burguer 10", img: "https://cdn-icons-png.flaticon.com/512/3075/3075977.png"},
           {nome: "Farmácia", img: "https://cdn-icons-png.flaticon.com/512/4320/4320337.png"},
           {nome: "Distribuidora", img: "https://cdn-icons-png.flaticon.com/512/952/952306.png"}
        ];
-
        document.getElementById('listaParceiros').innerHTML = parceiros.map(p => `
-          <div style="text-align: center; min-width: 80px; cursor: pointer;" onclick="window.Utils.showToast('Loja selecionada: ${p.nome}', 'info')">
-             <img src="${p.img}" style="width: 60px; height: 60px; background: #fff; border-radius: 50%; padding: 5px; border: 1px solid #eee; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
-             <p style="font-size: 11px; margin-top: 5px; font-weight: 600; color: #555;">${p.nome}</p>
+          <div style="text-align: center; min-width: 85px;" onclick="window.Utils.showToast('Loja selecionada: ${p.nome}', 'info')">
+             <div style="width: 65px; height: 65px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto; box-shadow: 0 4px 8px rgba(0,0,0,0.05); border: 1px solid #eee;">
+                <img src="${p.img}" style="width: 40px;">
+             </div>
+             <p style="font-size: 11px; margin-top: 8px; font-weight: 700; color: #666;">${p.nome}</p>
           </div>
        `).join('');
+    }
+
+    function getStatusColor(status) {
+      const cores = {'pendente': '#f1c40f', 'aguardando_entregador': '#e67e22', 'aceito': '#3498db', 'em_entrega': '#9b59b6', 'finalizado': '#2ecc71', 'cancelado': '#E30613'};
+      return cores[status] || '#999';
     }
   </script>
 </body>
 </html>
-
