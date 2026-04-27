@@ -34,10 +34,13 @@
       background: white; border: 1px solid #ddd; color: #555;
       font-weight: 600; display: flex; align-items: center;
       justify-content: center; gap: 12px; padding: 12px; border-radius: 12px;
+      cursor: pointer; transition: 0.2s;
     }
+    .btn-google:hover { background: #f1f1f1; }
     .input-animated {
       border: 2px solid #eee; border-radius: 12px;
       padding: 12px 16px; transition: all 0.3s ease; width: 100%; margin-bottom: 15px;
+      box-sizing: border-box;
     }
     .input-animated:focus { border-color: var(--primary-red); outline: none; }
     .loading-overlay {
@@ -57,6 +60,7 @@
         <img src="https://i.postimg.cc/T2Vt53JP/Vermelho-delivery-logo-20260227-011329-0005.png" style="width: 80px; border-radius: 50%;">
     </div>
     <p style="margin-top: 15px; font-weight: 600;">Conectando à Benaion...</p>
+    <button onclick="document.getElementById('loadingOverlay').style.display='none'" style="margin-top:20px; background:none; border:1px solid white; color:white; padding:5px 10px; border-radius:5px; font-size:10px;">Cancelar</button>
   </div>
 
   <div class="login-container animate__animated animate__fadeInUp">
@@ -68,7 +72,7 @@
       <h2 style="text-align: center; font-weight: 800; margin-bottom: 8px;">Bem-vindo</h2>
       <p style="text-align: center; color: #777; font-size: 14px; margin-bottom: 24px;">Entre para continuar</p>
 
-      <button onclick="handleGoogleLogin()" class="btn-google w-100 mb-3" style="width: 100%; cursor: pointer;">
+      <button onclick="handleGoogleLogin()" class="btn-google w-100 mb-3" style="width: 100%;">
         <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="18">
         Continuar com Google
       </button>
@@ -109,14 +113,14 @@
         
         <input type="text" class="input-animated" id="registerName" placeholder="Nome Completo" required>
         
-        <div id="parceiroExtraFields" class="hidden" style="display: none;">
+        <div id="parceiroExtraFields" style="display: none;">
             <input type="text" class="input-animated" id="storeName" placeholder="Nome da Loja">
         </div>
 
         <input type="email" class="input-animated" id="registerEmail" placeholder="Email" required>
         <input type="password" class="input-animated" id="registerPassword" placeholder="Senha (mín. 6 dígitos)" required minlength="6">
         
-        <button type="submit" class="btn btn-primary w-100" style="width: 100%; padding: 14px; background: var(--primary-red); color: white; border: none; border-radius: 12px;">
+        <button type="submit" class="btn btn-primary w-100" style="width: 100%; padding: 14px; background: var(--primary-red); color: white; border: none; border-radius: 12px; cursor: pointer;">
           CONCLUIR CADASTRO
         </button>
       </form>
@@ -139,8 +143,10 @@
 
     async function handleEmailLogin(event) {
       event.preventDefault();
-      if (!window.Auth) return;
+      if (!window.Auth) { window.Utils.showToast("Iniciando conexão...", "info"); return; }
+      
       loading.style.display = 'flex';
+      
       try {
         await window.Auth.loginWithEmail(document.getElementById('email').value, document.getElementById('password').value);
       } catch (e) {
@@ -152,36 +158,46 @@
     async function handleRegister(event) {
       event.preventDefault();
       if (!window.authService) {
-        window.Utils.showToast("Carregando sistema...", "info");
+        window.Utils.showToast("Sistema carregando...", "info");
         return;
       }
       loading.style.display = 'flex';
 
-      const email = document.getElementById('registerEmail').value;
-      const pass = document.getElementById('registerPassword').value;
-      const userType = document.getElementById('registerUserType').value;
-
       try {
+        const email = document.getElementById('registerEmail').value;
+        const pass = document.getElementById('registerPassword').value;
+        const userType = document.getElementById('registerUserType').value;
+
         const userCredential = await window.authService.createUserWithEmailAndPassword(window.auth, email, pass);
         const dados = {
           name: document.getElementById('registerName').value,
           email: email,
           userType: userType,
-          storeName: document.getElementById('storeName').value || null
+          storeName: (userType === 'parceiro') ? document.getElementById('storeName').value : null
         };
         await window.API.saveUserToFirestore(userCredential.user.uid, dados);
         window.location.href = `${userType}.html`;
       } catch (e) {
         loading.style.display = 'none';
-        window.Utils.showToast("Erro ao cadastrar. Tente outro email.", "error");
+        window.Utils.showToast("Erro: " + (e.message.includes("email-already") ? "Email já cadastrado" : "Falha no cadastro"), "error");
       }
     }
 
     async function handleGoogleLogin() {
-      if (!window.Auth) return;
+      if (!window.Auth) { window.Utils.showToast("Aguarde o carregamento...", "info"); return; }
+      
       loading.style.display = 'flex';
-      try { await window.Auth.loginWithGoogle(); }
-      catch (e) { loading.style.display = 'none'; }
+      
+      // Proteção para não travar a tela se o popup for bloqueado
+      setTimeout(() => { if(loading.style.display === 'flex') loading.style.display = 'none'; }, 10000);
+
+      try {
+        await window.Auth.loginWithGoogle();
+      } catch (e) {
+        loading.style.display = 'none';
+        console.error(e);
+        window.Utils.showToast("Login cancelado ou falhou", "error");
+      }
     }
   </script>
 </body>
