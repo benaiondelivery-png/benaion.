@@ -1,46 +1,52 @@
 // ========================================
-// BENAION DELIVERY - CLIENTE (V1.6.0)
+// BENAION DELIVERY - CLIENTE (V2.0)
 // ========================================
+import { db } from './api.js';
+import { collection, query, where, onSnapshot, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 let meusPedidos = [];
 let user = null;
 
 async function initCliente() {
-    if (window.Auth && window.API && window.Utils) {
-        // 1. Proteção de Rota
-        if (!window.Auth.requireAuth(['cliente'])) return;
-        
-        user = window.Auth.getCurrentUser();
-        
-        // 2. UI Inicial
-        document.getElementById('nomeUsuario').textContent = user.name.split(' ')[0];
-        
-        // 3. Carga de Dados
-        await carregarMeusPedidos();
-        
-        // 4. Loop de Atualização (Sincroniza status do pedido em tempo real)
-        setInterval(carregarMeusPedidos, 30000); 
-
-    } else {
+    if (!window.Auth || !window.API || !window.Utils) {
         setTimeout(initCliente, 300);
+        return;
     }
+
+    if (!window.Auth.requireAuth(['cliente'])) return;
+    user = window.Auth.getCurrentUser();
+    
+    // UI Inicial (Mantendo seu padrão visual)
+    const nomeEl = document.getElementById('nomeUsuario');
+    if (nomeEl) nomeEl.textContent = user.name.split(' ')[0];
+    
+    // Escuta Pedidos em Tempo Real (Adeus loop de 30s!)
+    escutarMeusPedidos();
 }
 
-// --- CORE: BUSCA DE DADOS ---
-async function carregarMeusPedidos() {
-    try {
-        const result = await window.API.getPedidos(1, 50); // Pega os últimos 50
-        // Filtra apenas os pedidos deste cliente (usando o UID do Firebase)
-        meusPedidos = result.data.filter(p => p.clienteId === user.id);
+// 1. MONITORAMENTO REAL-TIME
+function escutarMeusPedidos() {
+    const q = query(
+        collection(db, "pedidos"), 
+        where("clienteId", "==", user.id)
+    );
+
+    onSnapshot(q, (snapshot) => {
+        meusPedidos = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
         
+        // Ordena: Mais recentes primeiro
+        meusPedidos.sort((a, b) => {
+            const da = a.created_at?.seconds ? a.created_at.seconds : a.created_at;
+            const db = b.created_at?.seconds ? b.created_at.seconds : b.created_at;
+            return db - da;
+        });
+
         renderizarListaPedidos();
         atualizarResumo();
-    } catch (error) {
-        console.error("Erro ao carregar histórico:", error);
-    }
+    });
 }
 
-// --- UI: RENDERIZAÇÃO ---
+// 2. RENDERIZAÇÃO (Preservando Cores e Fontes)
 function renderizarListaPedidos() {
     const container = document.getElementById('listaPedidos');
     if (!container) return;
@@ -54,92 +60,102 @@ function renderizarListaPedidos() {
         return;
     }
 
-    // Ordena: Mais recentes primeiro
-    meusPedidos.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-
     container.innerHTML = meusPedidos.map(p => `
         <div class="card pedido-item animate__animated animate__fadeIn" style="margin-bottom:15px; border-left: 5px solid ${getStatusColor(p.status)}">
             <div style="display:flex; justify-content:space-between; align-items:start;">
                 <div>
                     <span style="font-size:12px; color:#666;">#${p.id.substring(0,6).toUpperCase()}</span>
-                    <h4 style="margin:5px 0;">${p.lojaNome || 'Benaion Delivery'}</h4>
+                    <h4 style="margin:5px 0; color:#333;">${p.lojaNome || 'Benaion Delivery'}</h4>
                 </div>
-                <span class="badge" style="background:${getStatusColor(p.status)}; color:white; font-size:10px; padding:4px 8px; border-radius:10px;">
-                    ${window.Utils.getStatusText(p.status)}
+                <span class="badge" style="background:${getStatusColor(p.status)}; color:white; font-size:10px; padding:4px 8px; border-radius:10px; font-weight:bold;">
+                    ${window.Utils.getStatusText(p.status).toUpperCase()}
                 </span>
             </div>
             
-            <div style="margin:10px 0; font-size:13px; color:#444;">
-                <i class="fas fa-map-marker-alt" style="color:var(--primary-red)"></i> ${p.bairroEntrega}<br>
-                <i class="fas fa-utensils" style="color:var(--primary-red)"></i> ${p.descricao || 'Itens diversos'}
+            <div style="margin:10px 0; font-size:13px; color:#555;">
+                <p style="margin:3px 0;"><i class="fas fa-map-marker-alt" style="color:var(--primary-red)"></i> ${p.bairro || p.bairroEntrega}</p>
+                <p style="margin:3px 0;"><i class="fas fa-box" style="color:var(--primary-red)"></i> ${p.descricao || 'Itens diversos'}</p>
             </div>
 
-            <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid #eee; pt-10; margin-top:10px; padding-top:10px;">
-                <span style="font-weight:bold; color:var(--dark);">${window.Utils.formatCurrency(p.valorTotal)}</span>
-                <button class="btn btn-small btn-outline" onclick="repetirPedido('${p.id}')" style="font-size:11px;">
-                    <i class="fas fa-redo"></i> Repetir
+            <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid #eee; margin-top:10px; padding-top:10px;">
+                <span style="font-weight:bold; color:#E30613; font-size:16px;">${window.Utils.formatCurrency(p.valorTotal)}</span>
+                <button class="btn btn-small btn-outline" onclick="repetirPedido('${p.id}')" style="font-size:11px; border:1px solid #ddd; padding:5px 10px; border-radius:5px;">
+                    <i class="fas fa-redo"></i> REPETIR
                 </button>
             </div>
         </div>
     `).join('');
 }
 
-// --- LÓGICA DE PEDIDO ---
-async function criarPedido(dados) {
+// 3. CRIAÇÃO DE PEDIDO (Usando as Taxas do Admin)
+window.fazerNovoPedido = async (e) => {
+    e.preventDefault();
+    const btn = e.target.querySelector('button');
+    btn.disabled = true;
+
     try {
-        // Validação da Tabela de Taxas antes de enviar
-        const taxaEntrega = window.API.calcularTaxa(dados.bairroRetirada, dados.bairroEntrega);
+        const bairroEntrega = document.getElementById('entregaBairro').value;
+        const bairroLoja = "Centro"; // Ou pegar de um select de lojas
         
+        // Busca a taxa configurada dinamicamente no Admin
+        const taxaEntrega = window.API.calcularTaxa(bairroLoja, bairroEntrega);
+        const valorProdutos = parseFloat(document.getElementById('valorProdutos').value || 0);
+
         const novoPedido = {
             clienteId: user.id,
             clienteNome: user.name,
+            clienteTel: user.telefone || "",
             status: 'pendente',
+            bairro: bairroEntrega,
+            bairroRetirada: bairroLoja,
             taxaEntrega: taxaEntrega,
-            valorTotal: parseFloat(dados.valorProdutos) + taxaEntrega,
-            created_at: new Date().toISOString(),
-            ...dados
+            valorProdutos: valorProdutos,
+            valorTotal: valorProdutos + taxaEntrega,
+            descricao: document.getElementById('pedidoDesc').value,
+            created_at: Date.now()
         };
 
-        await window.API.createPedido(novoPedido);
-        window.Utils.showToast("Pedido enviado com sucesso!", "success");
-        await carregarMeusPedidos();
+        await addDoc(collection(db, "pedidos"), novoPedido);
+        window.Utils.showToast("Pedido enviado! Acompanhe o status.", "success");
+        window.Utils.hideModal('modalNovoPedido');
+        e.target.reset();
     } catch (error) {
         window.Utils.showToast("Erro ao processar pedido", "error");
+    } finally {
+        btn.disabled = false;
     }
-}
+};
 
-// --- AUXILIARES ---
+// 4. AUXILIARES E UI
 function getStatusColor(status) {
     const cores = {
         'pendente': '#f1c40f',    // Amarelo
-        'aceito': '#3498db',      // Azul
-        'em_transito': '#e67e22', // Laranja
-        'concluido': '#2ecc71',   // Verde
+        'preparando': '#3498db',  // Azul
+        'pronto': '#9b59b6',      // Roxo
+        'aceito': '#e67e22',      // Laranja
+        'em_entrega': '#e67e22',  // Laranja
+        'finalizado': '#2ecc71',  // Verde
         'cancelado': '#e74c3c'    // Vermelho
     };
     return cores[status] || '#95a5a6';
 }
 
 function atualizarResumo() {
-    const totalGasto = meusPedidos
-        .filter(p => p.status === 'concluido')
-        .reduce((acc, p) => acc + (p.valorTotal || 0), 0);
+    const concluidos = meusPedidos.filter(p => p.status === 'finalizado');
+    const totalGasto = concluidos.reduce((acc, p) => acc + (p.valorTotal || 0), 0);
     
-    const countEl = document.getElementById('countPedidos');
-    const gastoEl = document.getElementById('totalGasto');
-    
-    if (countEl) countEl.textContent = meusPedidos.length;
-    if (gastoEl) gastoEl.textContent = window.Utils.formatCurrency(totalGasto);
+    if (document.getElementById('countPedidos')) document.getElementById('countPedidos').textContent = concluidos.length;
+    if (document.getElementById('totalGasto')) document.getElementById('totalGasto').textContent = window.Utils.formatCurrency(totalGasto);
 }
 
-function repetirPedido(id) {
+window.repetirPedido = (id) => {
     const anterior = meusPedidos.find(p => p.id === id);
     if (anterior) {
-        // Preenche o modal de pedido com os dados antigos
-        // Exemplo: document.getElementById('prodDesc').value = anterior.descricao;
+        const descInput = document.getElementById('pedidoDesc');
+        if (descInput) descInput.value = anterior.descricao;
         window.Utils.showModal('modalNovoPedido');
-        window.Utils.showToast("Dados do último pedido carregados!");
+        window.Utils.showToast("Pedido anterior carregado!");
     }
-}
+};
 
 document.addEventListener('DOMContentLoaded', initCliente);
